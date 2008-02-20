@@ -22,8 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.ochafik.util.Adapter;
-
 public class AdaptedList<U, V> extends AdaptedCollection<U,V> implements ListenableList<V> {
 	protected final List<U> list;
 	

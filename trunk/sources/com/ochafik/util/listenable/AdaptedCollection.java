@@ -23,8 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-import com.ochafik.util.Adapter;
-
 /**
  * ListenableCollection<V> that wraps a Collection<U>, using adapters from U to V (and optionnally backwards, for support of the add(V) method).<br>
  * This is useful to convert a collection to another type : as there is no copy of the wrapped collection, both collections stay in sync.<br>
