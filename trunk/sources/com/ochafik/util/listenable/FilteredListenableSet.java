@@ -24,9 +24,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.ochafik.util.Filter;
-
-
 public class FilteredListenableSet<T> implements ListenableSet<T>, CollectionListener<T> {
 	ListenableSet<T> listenableSet;
 	Filter<T> filter;
@@ -39,7 +36,7 @@ public class FilteredListenableSet<T> implements ListenableSet<T>, CollectionLis
 		synchronized (listenableSet) {
 			lastFilteredSet = new HashSet<T>(listenableSet.size());
 			for (T element : listenableSet) {
-				if (filter == null || filter.acceptValue(element)) {
+				if (filter == null || filter.accept(element)) {
 					lastFilteredSet.add(element);
 				}
 			}
@@ -50,7 +47,7 @@ public class FilteredListenableSet<T> implements ListenableSet<T>, CollectionLis
 		CollectionEvent.EventType type = e.getType();
 		Collection<T> effectiveElements = new ArrayList<T>(e.getElements().size());
 		for (T element : e.getElements()) {
-			if (filter == null || filter.acceptValue(element)) {
+			if (filter == null || filter.accept(element)) {
 				switch (type) {
 				case ADDED:
 					if (lastFilteredSet.add(element)) {
@@ -74,14 +71,14 @@ public class FilteredListenableSet<T> implements ListenableSet<T>, CollectionLis
 		Collection<T> addedElements = new ArrayList<T>(max), removedElements = new ArrayList<T>(max);
 		synchronized (listenableSet) {
 			for (T element : listenableSet) {
-				if (filter == null || filter.acceptValue(element)) {
-					if (!(this.filter == null || this.filter.acceptValue(element))) {
+				if (filter == null || filter.accept(element)) {
+					if (!(this.filter == null || this.filter.accept(element))) {
 						// newly accepted
 						if (lastFilteredSet.add(element)) {
 							addedElements.add(element);
 						}
 					}
-				} else if (this.filter == null || this.filter.acceptValue(element)) {
+				} else if (this.filter == null || this.filter.accept(element)) {
 					// newly refused
 					if (lastFilteredSet.remove(element)) {
 						removedElements.add(element);
