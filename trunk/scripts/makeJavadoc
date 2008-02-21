@@ -1,0 +1,16 @@
+#!/bin/bash
+
+find sources -iname "*.java" > .list.tmp
+svn update && javadoc -d javadoc/ -classpath sources/:/Users/ochafik/Prog/Java/libraries/jmdns.jar @.list.tmp
+
+# See http://stuffthathappens.com/blog/2007/11/09/howto-publish-javadoc-on-google-code/
+find javadoc/ -iname "*.html" -exec svn propset svn:mime-type text/html '{}' ';'
+find javadoc/ -iname "*.css" -exec svn propset svn:mime-type text/css '{}' ';'
+find javadoc/ -iname "*.txt" -exec svn propset svn:mime-type text/plain '{}' ';'
+find javadoc/ -iname "*.png" -exec svn propset svn:mime-type image/png '{}' ';'
+find javadoc/ -iname "*.jpg" -exec svn propset svn:mime-type image/jpeg '{}' ';'
+find javadoc/ -iname "*.jpeg" -exec svn propset svn:mime-type image/jpeg '{}' ';'
+
+svn commit javadoc -m "Javadoc update"
+
+rm -f .list.tmp
