@@ -13,7 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   This file is part of the Jalico project (Java Listenable Collections).
+   This file comes from the Jalico project (Java Listenable Collections)
+
+       http://jalico.googlecode.com/.
 */
 /**
  * 
@@ -35,7 +37,7 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 
-class ZeroConfListenableMap extends DefaultListenableMap<String, ServiceInfo> implements ServiceListener {
+public class ZeroConfListenableMap extends DefaultListenableMap<String, ServiceInfo> implements ServiceListener {
 	String typeString;
 	
 	public ZeroConfListenableMap(final String typeString) {

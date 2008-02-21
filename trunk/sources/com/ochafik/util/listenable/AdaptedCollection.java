@@ -13,7 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   This file is part of the Jalico project (Java Listenable Collections).
+   This file comes from the Jalico project (Java Listenable Collections)
+
+	  http://jalico.googlecode.com/
 */
 package com.ochafik.util.listenable;
 
@@ -24,7 +26,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * ListenableCollection<V> that wraps a Collection<U>, using adapters from U to V (and optionnally backwards, for support of the add(V) method).<br>
+ * ListenableCollection&lt;V&gt; that wraps a Collection&lt;U&gt;, using adapters from U to V (and optionnally backwards, for support of the add(V) method).<br>
  * This is useful to convert a collection to another type : as there is no copy of the wrapped collection, both collections stay in sync.<br>
  * The resulting wrapped collection is listenable, and listens to modifications of its wrapped collection if it is an instance of ListenableCollection.
  * @author Olivier Chafik

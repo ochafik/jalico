@@ -13,7 +13,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   This file is part of the Jalico project (Java Listenable Collections).
+   This file comes from the Jalico project (Java Listenable Collections)
+
+       http://jalico.googlecode.com/.
 */
 package com.ochafik.util.listenable;
 
