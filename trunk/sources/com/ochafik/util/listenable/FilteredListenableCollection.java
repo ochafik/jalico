@@ -22,7 +22,7 @@ package com.ochafik.util.listenable;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class FilteredListenableCollection<T> implements ListenableCollection<T> {
+class FilteredListenableCollection<T> implements ListenableCollection<T> {
 	protected final ListenableCollection<T> listenableCollection;
 
 	public FilteredListenableCollection(ListenableCollection<T> listenableCollection) {

@@ -32,7 +32,7 @@ public class FilteredListenableSet<T> implements ListenableSet<T>, CollectionLis
 	Set<T> lastFilteredSet;
 	
 	ListenableSupport<T> collectionSupport = new ListenableSupport<T>();
-	public FilteredListenableSet(ListenableSet<T> listenableSet,Filter<T> filter) {
+	public FilteredListenableSet(ListenableSet<T> listenableSet, Filter<T> filter) {
 		this.listenableSet = listenableSet;
 		this.filter = filter;
 		synchronized (listenableSet) {

@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 
-public class FilteredListenableMap<K, V> implements ListenableMap<K, V> {
+class FilteredListenableMap<K, V> implements ListenableMap<K, V> {
 	ListenableMap<K, V> listenableMap;
 
 	
