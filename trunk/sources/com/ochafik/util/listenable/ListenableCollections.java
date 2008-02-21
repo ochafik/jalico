@@ -40,6 +40,18 @@ public class ListenableCollections {
 		return new UnmodifiableListenableMap<K,V>(map);
 	}
 	
+	public static final <T> ListenableSet<T> synchronizedSet(ListenableSet<T> set) {
+		return new SynchronizedListenableSet<T>(set);
+	}
+	
+	public static final <T> ListenableCollection<T> synchronizedCollection(ListenableCollection<T> col) {
+		return new SynchronizedListenableCollection<T>(col);
+	}
+	
+	public static final <K,V> ListenableMap<K,V> synchronizedMap(ListenableMap<K,V> map) {
+		return new SynchronizedListenableMap<K,V>(map);
+	}
+	
 	public static final <T> ListenableCollection<T> listenableCollection(Collection<T> x) {
 		return new DefaultListenableCollection<T>(x);
 	}
