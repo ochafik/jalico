@@ -48,9 +48,6 @@ public class CollectionEvent<T> extends EventObject {
 	/// Type of the event
 	EventType type;
 	
-	/// Origin of the event
-	ListenableCollection<T> source;
-	
 	/// Elements affected by the event
 	Collection<T> elements;
 	
@@ -60,8 +57,9 @@ public class CollectionEvent<T> extends EventObject {
 	/// Index of the last affected element in the source, or -1 if not applicable
 	int lastIndex = -1;
 	
+	@SuppressWarnings("unchecked")
 	public ListenableCollection<T> getSource() {
-		return source;
+		return (ListenableCollection<T>)super.getSource();
 	}
 	
 	public EventType getType() {
@@ -77,17 +75,17 @@ public class CollectionEvent<T> extends EventObject {
 	public int getLastIndex() {
 		return lastIndex;
 	}
-	public CollectionEvent(ListenableCollection<T> listenableCollection,Collection<T> elements, EventType type) {
+	public CollectionEvent(ListenableCollection<T> source,Collection<T> elements, EventType type) {
+		super(source);
 		this.elements = elements;
 		this.type = type;
-		this.source = listenableCollection;
 	}
-	public CollectionEvent(ListenableCollection<T> listenableCollection,Collection<T> elements, EventType type, int firstIndex, int lastIndex) {
+	public CollectionEvent(ListenableCollection<T> source,Collection<T> elements, EventType type, int firstIndex, int lastIndex) {
+		super(source);
 		this.elements = elements;
 		this.type = type;
 		this.firstIndex = firstIndex;
 		this.lastIndex = lastIndex;
-		this.source = listenableCollection;
 	}
 	
 }

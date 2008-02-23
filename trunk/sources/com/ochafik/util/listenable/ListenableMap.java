@@ -25,7 +25,8 @@ import java.util.Map;
  * Interface for maps which key set supports modification listeners.<br/>
  * TODO also require that the entry set is listenable
  * @author Olivier Chafik
- * @param <T> Type of the keys of the map
+ * @param <K> Type of the keys of the map
+ * @param <V> Type of the values of the map
  */
 public interface ListenableMap<K,V> extends Map<K,V> {
 	public ListenableSet<K> keySet();

@@ -26,12 +26,13 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * ListenableCollection&lt;V&gt; that wraps a Collection&lt;U&gt;, using adapters from U to V (and optionnally backwards, for support of the add(V) method).<br>
- * This is useful to convert a collection to another type : as there is no copy of the wrapped collection, both collections stay in sync.<br>
+ * ListenableCollection&lt;V&gt; that wraps a Collection&lt;U&gt;, using adapters from U to V (and optionnally backwards, for support of the add(V) method).<br/>
+ * If the wrapped collection implements ListenableCollection, all its events will be adapted and propagated to listeners of the AdaptedCollection.<br/> 
+ * This is useful to convert a collection to another type<br/>
  * The resulting wrapped collection is listenable, and listens to modifications of its wrapped collection if it is an instance of ListenableCollection.
  * @author Olivier Chafik
  * @param <U> type of the elements of the wrapped collection
- * @param <V> type of the elements of this collection
+ * @param <V> type of the elements of the adapted collection
  */
 public class AdaptedCollection<U, V> extends AbstractCollection<V> implements ListenableCollection<V> {
 	protected final Collection<U> collection;

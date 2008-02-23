@@ -24,6 +24,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * ListenableList&lt;V&gt; that wraps a List&lt;U&gt;, using adapters from U to V (and optionnally backwards, for support of the add(V) method).<br/>
+ * If the wrapped collection implements ListenableList, all its events will be adapted and propagated to listeners of the AdaptedList.<br/> 
+ * This is useful to convert a list to another type<br/>
+ * The resulting wrapped collection is listenable, and listens to modifications of its wrapped collection if it is an instance of ListenableCollection.
+ * @author Olivier Chafik
+ * @param <U> type of the elements of the wrapped list
+ * @param <V> type of the elements of the adapted list
+ */
 public class AdaptedList<U, V> extends AdaptedCollection<U,V> implements ListenableList<V> {
 	protected final List<U> list;
 	

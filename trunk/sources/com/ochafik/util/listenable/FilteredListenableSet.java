@@ -26,64 +26,76 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * Sub-view of a listenable set, which only contains elements of the original set that were accepted by a Filter.<br/>
+ * The set of elements that passed the filter test is cached to improve speed at the expense of memory consumption. 
+ * @see com.ochafik.util.listenable.Filter
+ * @author ochafik
+ * @param <T> type of the elements of the set
+ */
 public class FilteredListenableSet<T> implements ListenableSet<T>, CollectionListener<T> {
-	ListenableSet<T> listenableSet;
+	ListenableSet<T> set;
 	Filter<T> filter;
 	Set<T> lastFilteredSet;
 	
 	ListenableSupport<T> collectionSupport = new ListenableSupport<T>();
-	public FilteredListenableSet(ListenableSet<T> listenableSet, Filter<T> filter) {
-		this.listenableSet = listenableSet;
+	public FilteredListenableSet(ListenableSet<T> set) {
+		this(set, null);
+	}
+	public FilteredListenableSet(ListenableSet<T> set, Filter<T> filter) {
+		this.set = set;
 		this.filter = filter;
-		synchronized (listenableSet) {
-			lastFilteredSet = new HashSet<T>(listenableSet.size());
-			for (T element : listenableSet) {
-				if (filter == null || filter.accept(element)) {
-					lastFilteredSet.add(element);
-				}
+		
+		for (T element : set) {
+			if (filter == null || filter.accept(element)) {
+				lastFilteredSet.add(element);
 			}
-			listenableSet.addCollectionListener(this);
 		}
 	}
 	public void collectionChanged(CollectionEvent<T> e) {
 		CollectionEvent.EventType type = e.getType();
-		Collection<T> effectiveElements = new ArrayList<T>(e.getElements().size());
+		Collection<T> filteredElements = new ArrayList<T>(e.getElements().size());
 		for (T element : e.getElements()) {
 			if (filter == null || filter.accept(element)) {
 				switch (type) {
 				case ADDED:
 					if (lastFilteredSet.add(element)) {
-						effectiveElements.add(element);
+						filteredElements.add(element);
 					}
 					break;
 				case REMOVED:
 					if (lastFilteredSet.remove(element)) {
-						effectiveElements.add(element);
+						filteredElements.add(element);
 					}
 					break; 
 				case UPDATED:
 					break;
 				}	
 			}
-			collectionSupport.fireEvent(this, effectiveElements, type, -1, -1);
+			collectionSupport.fireEvent(this, filteredElements, type, -1, -1);
 		}
 	}
 	public void setFilter(Filter<T> filter) {
-		int max = listenableSet.size();
+		int max = set.size();
 		Collection<T> addedElements = new ArrayList<T>(max), removedElements = new ArrayList<T>(max);
-		synchronized (listenableSet) {
-			for (T element : listenableSet) {
-				if (filter == null || filter.accept(element)) {
-					if (!(this.filter == null || this.filter.accept(element))) {
-						// newly accepted
-						if (lastFilteredSet.add(element)) {
-							addedElements.add(element);
-						}
+		synchronized (set) {
+			Filter<T> oldFilter = this.filter;
+			for (T element : set) {
+				if (oldFilter == null || oldFilter.accept(element)) {
+					if (filter == null || filter.accept(element)) {
+						// still accepted : nothing to do
+					} else {
+						// not accepted anymore
+						if (lastFilteredSet.remove(element)) 
+							removedElements.add(element);
 					}
-				} else if (this.filter == null || this.filter.accept(element)) {
-					// newly refused
-					if (lastFilteredSet.remove(element)) {
-						removedElements.add(element);
+				} else {
+					if (filter == null || filter.accept(element)) {
+						// now accepted
+						if (lastFilteredSet.add(element))
+							addedElements.add(element);
+					} else {
+						// still not accepted : nothing to do
 					}
 				}
 			}
@@ -93,26 +105,46 @@ public class FilteredListenableSet<T> implements ListenableSet<T>, CollectionLis
 		collectionSupport.fireRemoved(this, removedElements);
 	}
 	public boolean add(T o) {
-		throw new UnsupportedOperationException();
+		return set.add(o);
 	}
 	public boolean addAll(Collection<? extends T> c) {
-		throw new UnsupportedOperationException();
+		return set.addAll(c);
 	}
 	public void addCollectionListener(CollectionListener<T> l) {
 		collectionSupport.addCollectionListener(l);
 	}
 	public void clear() {
-		throw new UnsupportedOperationException();
+		set.clear();
 	}
 	public boolean contains(Object o) {
+		//return set.contains(o) && (filter == null || filter.accept((T)o));
 		return lastFilteredSet.contains(o);
 	}
 	public boolean containsAll(Collection<?> c) {
 		return lastFilteredSet.containsAll(c);
+		/*if (!set.containsAll(c))
+			return false;
+		
+		if (filter == null)
+			return true;
+		
+		for (Object o : c) {
+			if (!filter.accept((T)o))
+				return false;
+		}
+		return true;*/
 	}
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == this)
+			return true;
+		
 		return lastFilteredSet.equals(obj);
+		/*if (obj == null || !(obj instanceof Set))
+			return false;
+		
+		Set s = (Set)obj;
+		return set.containsAll(s) && s.size() == size();*/
 	}
 	@Override
 	public int hashCode() {
@@ -125,10 +157,19 @@ public class FilteredListenableSet<T> implements ListenableSet<T>, CollectionLis
 		return Collections.unmodifiableCollection(lastFilteredSet).iterator();
 	}
 	public boolean remove(Object o) {
-		throw new UnsupportedOperationException();
+		if (lastFilteredSet.contains(o)) {
+			return set.remove(o);
+		}
+		return false;
+		//return (filter == null || filter.accept((T)o)) && set.remove(o);
 	}
 	public boolean removeAll(Collection<?> c) {
-		throw new UnsupportedOperationException();
+		boolean changed = false;
+		for (Object o : c) {
+			if (remove(o))
+				changed = true;
+		}
+		return changed;
 	}
 	public void removeCollectionListener(CollectionListener<T> l) {
 		collectionSupport.removeCollectionListener(l);
