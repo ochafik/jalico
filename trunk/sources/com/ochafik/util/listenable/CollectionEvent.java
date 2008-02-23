@@ -20,27 +20,57 @@
 package com.ochafik.util.listenable;
 
 import java.util.Collection;
+import java.util.EventObject;
 
-
-public class CollectionEvent<T> {
-	ListenableCollection<T> listenableCollection;
-	public ListenableCollection<T> getListenableCollection() {
-		return listenableCollection;
-	}
+/**
+ * <p>
+ * Event that represents a modification of a listenable collection.<br/>
+ * An event can be of three types : addition, removal and update.<br/>
+ * Multiple elements can be packed in the same event instance.<br/>
+ * For instance, if a listenable collection is cleared then it may issue no more than a single REMOVED event with all of its elements as argument.
+ * </p>
+ * <br/>
+ * <p>
+ * The UPDATED event type is here to notify the listeners that something changed about the elements referred to by the event.<br/>
+ * It is typically triggered when one adds an existing element to a ListenableSet.
+ * </p>  
+ * @author Olivier Chafik
+ * @param <T> Type of the elements of the collection from which the event originated
+ */
+public class CollectionEvent<T> extends EventObject {
+	/// Type of the event. 
 	public enum EventType {
-		ADDED, REMOVED, UPDATED
+		ADDED, 
+		REMOVED,
+		UPDATED
 	}
 	
+	/// Type of the event
 	EventType type;
+	
+	/// Origin of the event
+	ListenableCollection<T> source;
+	
+	/// Elements affected by the event
+	Collection<T> elements;
+	
+	/// Index of the first affected element in the source, or -1 if not applicable
+	int firstIndex = -1;
+	
+	/// Index of the last affected element in the source, or -1 if not applicable
+	int lastIndex = -1;
+	
+	public ListenableCollection<T> getSource() {
+		return source;
+	}
+	
 	public EventType getType() {
 		return type;
 	}
-	Collection<T> elements;
 	public Collection<T> getElements() {
 		return elements;
 	}
 	
-	int firstIndex = -1, lastIndex = -1;
 	public int getFirstIndex() {
 		return firstIndex;
 	}
@@ -50,14 +80,14 @@ public class CollectionEvent<T> {
 	public CollectionEvent(ListenableCollection<T> listenableCollection,Collection<T> elements, EventType type) {
 		this.elements = elements;
 		this.type = type;
-		this.listenableCollection = listenableCollection;
+		this.source = listenableCollection;
 	}
 	public CollectionEvent(ListenableCollection<T> listenableCollection,Collection<T> elements, EventType type, int firstIndex, int lastIndex) {
 		this.elements = elements;
 		this.type = type;
 		this.firstIndex = firstIndex;
 		this.lastIndex = lastIndex;
-		this.listenableCollection = listenableCollection;
+		this.source = listenableCollection;
 	}
 	
 }

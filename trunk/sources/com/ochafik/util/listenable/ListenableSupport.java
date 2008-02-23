@@ -48,34 +48,34 @@ public class ListenableSupport<T> {
 		return !listeners.isEmpty();
 	}
 	
-	public void fireEvent(ListenableCollection<T> listenableCollection, Collection<T> elements, CollectionEvent.EventType type, int firstIndex, int lastIndex) {
+	public void fireEvent(ListenableCollection<T> source, Collection<T> elements, CollectionEvent.EventType type, int firstIndex, int lastIndex) {
 		if (listeners == null || listeners.isEmpty() || elements.isEmpty()) 
 			return;
 		
-		CollectionEvent<T> event = new CollectionEvent<T>(listenableCollection,elements,type, firstIndex, lastIndex);
+		CollectionEvent<T> event = new CollectionEvent<T>(source,elements,type, firstIndex, lastIndex);
 		for (CollectionListener<T> listener : listeners) {
 			listener.collectionChanged(event);
 		}
 	}
 	
-	public void fireAdded(ListenableCollection<T> listenableCollection, Collection<T> elements) {
-		fireEvent(listenableCollection, elements, CollectionEvent.EventType.ADDED, -1, -1);
+	public void fireAdded(ListenableCollection<T> source, Collection<T> elements) {
+		fireEvent(source, elements, CollectionEvent.EventType.ADDED, -1, -1);
 	}
-	public void fireAdded(ListenableCollection<T> listenableCollection, Collection<T> elements, int firstIndex, int lastIndex) {
-		fireEvent(listenableCollection, elements, CollectionEvent.EventType.ADDED, firstIndex, lastIndex);
-	}
-	
-	public void fireRemoved(ListenableCollection<T> listenableCollection, Collection<T> elements) {
-		fireEvent(listenableCollection, elements, CollectionEvent.EventType.REMOVED, -1, -1);
-	}
-	public void fireRemoved(ListenableCollection<T> listenableCollection, Collection<T> elements, int firstIndex, int lastIndex) {
-		fireEvent(listenableCollection, elements, CollectionEvent.EventType.REMOVED, firstIndex, lastIndex);
+	public void fireAdded(ListenableCollection<T> source, Collection<T> elements, int firstIndex, int lastIndex) {
+		fireEvent(source, elements, CollectionEvent.EventType.ADDED, firstIndex, lastIndex);
 	}
 	
-	public void fireUpdated(ListenableCollection<T> listenableCollection, Collection<T> elements) {
-		fireEvent(listenableCollection, elements, CollectionEvent.EventType.UPDATED, -1, -1);
+	public void fireRemoved(ListenableCollection<T> source, Collection<T> elements) {
+		fireEvent(source, elements, CollectionEvent.EventType.REMOVED, -1, -1);
 	}
-	public void fireUpdated(ListenableCollection<T> listenableCollection, Collection<T> elements, int firstIndex, int lastIndex) {
-		fireEvent(listenableCollection, elements, CollectionEvent.EventType.UPDATED, firstIndex, lastIndex);
+	public void fireRemoved(ListenableCollection<T> source, Collection<T> elements, int firstIndex, int lastIndex) {
+		fireEvent(source, elements, CollectionEvent.EventType.REMOVED, firstIndex, lastIndex);
+	}
+	
+	public void fireUpdated(ListenableCollection<T> source, Collection<T> elements) {
+		fireEvent(source, elements, CollectionEvent.EventType.UPDATED, -1, -1);
+	}
+	public void fireUpdated(ListenableCollection<T> source, Collection<T> elements, int firstIndex, int lastIndex) {
+		fireEvent(source, elements, CollectionEvent.EventType.UPDATED, firstIndex, lastIndex);
 	}
 }

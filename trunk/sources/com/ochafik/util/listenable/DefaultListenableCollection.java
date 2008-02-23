@@ -51,6 +51,9 @@ public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 		return added;
 	}
 	public boolean addAll(Collection<? extends T> c) {
+		if (!collectionSupport.hasListeners())
+			return collection.addAll(c);
+		
 		boolean addedAny = false;
 		int max = c.size();
 		Collection<T> addedElements = new ArrayList<T>(max), updatedElements = new ArrayList<T>(max);
@@ -65,7 +68,10 @@ public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 		return addedAny;
 	}
 	public void clear() {
-		Collection<T> copy = new ArrayList<T>(this);
+		if (!collectionSupport.hasListeners())
+			collection.clear();
+			
+		Collection<T> copy = new ArrayList<T>(collection);
 		collection.clear();
 		collectionSupport.fireRemoved(this, copy);
 	}
@@ -119,6 +125,9 @@ public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 	}
 	@SuppressWarnings("unchecked")
 	public boolean removeAll(Collection<?> c) {
+		if (!collectionSupport.hasListeners())
+			return collection.removeAll(c);
+		
 		boolean removedAny = false;
 		int max = c.size();
 		Collection<T> removedElements = new ArrayList<T>(max);
@@ -132,6 +141,9 @@ public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 		return removedAny;
 	}
 	public boolean retainAll(Collection<?> c) {
+		if (!collectionSupport.hasListeners())
+			return collection.retainAll(c);
+		
 		boolean removedAny = false;
 		int max = c.size();
 		Collection<T> removedElements = new ArrayList<T>(max);

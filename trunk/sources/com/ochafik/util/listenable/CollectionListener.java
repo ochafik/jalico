@@ -19,6 +19,8 @@
 */
 package com.ochafik.util.listenable;
 
-public interface CollectionListener<T> {
+import java.util.EventListener;
+
+public interface CollectionListener<T> extends EventListener {
 	public void collectionChanged(CollectionEvent<T> e);
 }

@@ -82,7 +82,7 @@ public class ListenableCollections {
 				//System.out.println("Propagating "+e.getType() + " for elements "+e.getElements());
 				try {
 					currentlyPropagating = true;
-					ListenableCollection<T> recipient = e.getListenableCollection() == a ? b : a;
+					ListenableCollection<T> recipient = e.getSource() == a ? b : a;
 					
 					for (T t : e.getElements()) {
 						switch (e.getType()) {
