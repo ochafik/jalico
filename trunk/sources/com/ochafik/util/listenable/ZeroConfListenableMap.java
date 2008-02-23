@@ -41,14 +41,14 @@ import javax.swing.JScrollPane;
  * List of <a href="http://www.zeroconf.org/">ZeroConf</a> services discovered over the network.<br/>
  * <img src="zeroconfList.png" alt="Example run of this class, using the iTunes share service type string"/><br/>
  * <br/>
- * Also provides a singleton listenable list of advertised services that can be used to announce any service on the local network.<br/>
+ * Also provides a <a href="#getAdvertisedServiceInfos()">singleton read-write listenable list of advertised services</a> that can be used to announce any service on the local network.<br/>
  * <br/>  
  * Makes use of the <a href="http://jmdns.sourceforge.net/">JmDNS</a> library, that is compatible with Apple's Rendez-Vous technology (former Bonjour).<br/>
  * The constructor of this class takes a service type string as argument. You can look for existing registered service types on the page <a href="http://www.dns-sd.org/ServiceTypes.html">DNS SRV (RFC 2782) Service Types</a>.<br/>
  * Examples :
  * <ul>
  * <li>"_MyTestProtocol._tcp.local." for your tests
- * </li><li>"_daap._tcp" for the iTunes music shares discovery
+ * </li><li>"_daap._tcp.local." for the iTunes music shares discovery
  * </li>
  * </ul>
  * 
@@ -66,38 +66,13 @@ public class ZeroConfListenableMap extends DefaultListenableMap<String, ServiceI
 		}}.start();
 	}
 	
-	public synchronized void unregister() {
-		getJmDNS().removeServiceListener(typeString, this);
-	}
+static ListenableMap<String, ServiceInfo> advertisedServices;
 	
-	public void serviceAdded(final ServiceEvent event) {
-		new Thread() { public void run() {
-			getJmDNS().requestServiceInfo(typeString, event.getName());
-		}}.start();
-	}
-	
-	public synchronized void serviceRemoved(final ServiceEvent event) {
-		remove(event.getName());
-	}
-	
-	public synchronized void serviceResolved(ServiceEvent event) {
-		put(event.getName(), event.getInfo());
-	}
-	
-	static JmDNS jmDNS;
-	public static JmDNS getJmDNS() {
-		if (jmDNS == null) {
-			try {
-				jmDNS = new JmDNS();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-		return jmDNS;
-	}
-	
-	static ListenableMap<String, ServiceInfo> advertisedServices;
+	/**
+	 * Read-write listenable list of services advertised by this class.<br/>
+	 * To advertise a new service, first build a ServiceInfo instance with all the information you wish.<br/>
+	 * Then call ZeroConfListenableMap.getAdvertisedServiceInfos().put(serviceInfo.getName(), serviceInfo).
+	 */
 	public static ListenableMap<String, ServiceInfo> getAdvertisedServiceInfos() {
 		if (advertisedServices == null) {
 			advertisedServices = new DefaultListenableMap<String, ServiceInfo>(new HashMap<String, ServiceInfo>());
@@ -131,6 +106,53 @@ public class ZeroConfListenableMap extends DefaultListenableMap<String, ServiceI
 		}
 		return advertisedServices;
 	}
+	
+	/**
+	 * Stop the listening of services.
+	 */
+	public synchronized void unregister() {
+		getJmDNS().removeServiceListener(typeString, this);
+	}
+	
+	/**
+	 * Implementation of the ServiceListener interface
+	 */
+	public void serviceAdded(final ServiceEvent event) {
+		new Thread() { public void run() {
+			getJmDNS().requestServiceInfo(typeString, event.getName());
+		}}.start();
+	}
+	
+	/**
+	 * Implementation of the ServiceListener interface
+	 */
+	public synchronized void serviceRemoved(final ServiceEvent event) {
+		remove(event.getName());
+	}
+	
+	/**
+	 * Implementation of the ServiceListener interface
+	 */
+	public synchronized void serviceResolved(ServiceEvent event) {
+		put(event.getName(), event.getInfo());
+	}
+	
+	static JmDNS jmDNS;
+	/**
+	 * Get a singleton JmDNS instance
+	 */
+	public static JmDNS getJmDNS() {
+		if (jmDNS == null) {
+			try {
+				jmDNS = new JmDNS();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		return jmDNS;
+	}
+	
 	
 	public static void main(String[] args) {
 		//String key = "_zOlive._tcp.local.";
