@@ -19,10 +19,16 @@
 */
 package com.ochafik.util.listenable;
 
-import java.awt.Component;
-
 import javax.swing.AbstractListModel;
 
+/**
+ * Swing list model that dynamically reflects the contents of a listenable list.<br/>
+ * This model safely propagates events from the listenable list to any registered ListDataListener within the event dispatch thread, even if the events were received from an other thread.
+ * @see javax.swing.event.ListDataListener
+ * @see com.ochafik.util.listenable.SwingCollectionListener 
+ * @author Olivier Chafik
+ * @param <T> Type of the elements of the list
+ */
 public class ListenableListModel<T> extends AbstractListModel {
 	private ListenableList<T> list;
 	
@@ -46,6 +52,12 @@ public class ListenableListModel<T> extends AbstractListModel {
 			}
 		}
 	});
+	
+	/**
+	 * Set or change the listenable list which content is reflected by this list model.<br/>
+	 * May trigger DELETED events (if there was already a non-empty underlying list) and ADDED events (if the list being set is not empty).
+	 * @param list
+	 */
 	public void setList(ListenableList<T> list) {
 		ListenableList<T> oldList = this.list;
 		if (oldList != null) {
@@ -65,6 +77,7 @@ public class ListenableListModel<T> extends AbstractListModel {
 		}
 		
 	}
+	
 	public Object getElementAt(int index) {
 		return list.get(index);
 	}

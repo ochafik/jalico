@@ -25,7 +25,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-
+/**
+ * Default implementation of the ListenableList interface.<br/>
+ * This class follows both the decorator and proxy patterns : it wraps an existing java.util.Collection and adds the listenable feature to it.<br/>
+ * @author Olivier Chafik
+ * @param <T> Type of the elements of the list
+ */
 public class DefaultListenableList<T> extends DefaultListenableCollection<T> implements ListenableList<T>{
 	List<T> list;
 	public DefaultListenableList(List<T> list) {
@@ -42,14 +47,16 @@ public class DefaultListenableList<T> extends DefaultListenableCollection<T> imp
 	}
 	public void add(int index, T element) {
 		list.add(index, element);
-		//System.out.println("add "+index);
-		
 		collectionSupport.fireAdded(this,Collections.singleton(element), index, index);
 	}
 	public boolean addAll(int index, Collection<? extends T> c) {
 		int initSize = list.size();
-		list.addAll(index, c);
-		//System.out.println("addAll "+initSize);
+		if (!list.addAll(index, c)) {
+			if (list.size() != initSize)
+				throw new UnsupportedOperationException("Does not support listeners-enabled proxying of addAll(int, Collection) methods that are not atomical.");
+			
+			return false;
+		}
 		collectionSupport.fireAdded(this, new ArrayList<T>(c), initSize, initSize + c.size() - 1);
 		return true;
 	}
@@ -59,6 +66,10 @@ public class DefaultListenableList<T> extends DefaultListenableCollection<T> imp
 	public int indexOf(Object o) {
 		return list.indexOf(o);
 	}
+	
+	/**
+	 * Not supported yet.
+	 */
 	public ListIterator<T> listIterator() {
 		throw new UnsupportedOperationException();
 	}
@@ -67,16 +78,24 @@ public class DefaultListenableList<T> extends DefaultListenableCollection<T> imp
 	}
 	public T set(int index, T element) {
 		T value = list.set(index, element);
-		//System.out.println("set "+index);
-		collectionSupport.fireUpdated(this, Collections.singleton(value), index, index);
+		collectionSupport.fireUpdated(this, Collections.singleton(element), index, index);
 		return value;
 	}
+	
+	/**
+	 * There are no more guarantees made on the behaviour of the sublists returned by this method upon list change than there are on java.util.List.subList.
+	 */
 	public List<T> subList(int fromIndex, int toIndex) {
 		return new DefaultListenableList<T>(list.subList(fromIndex, toIndex),collectionSupport);
 	}
+	
+	/**
+	 * Not supported yet.
+	 */
 	public ListIterator<T> listIterator(int index) {
 		throw new UnsupportedOperationException();
 	}
+	
 	public T remove(int index) {
 		T removed = list.remove(index);
 		if (removed != null) {

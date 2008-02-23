@@ -21,6 +21,11 @@ package com.ochafik.util.listenable;
 
 import java.util.Collection;
 
+/**
+ * Interface for collections that support modification listeners.
+ * @author Olivier Chafik
+ * @param <T> Type of the elements of the collection
+ */
 public interface ListenableCollection<T> extends Collection<T>{
 	public void addCollectionListener(CollectionListener<T> l);
 	public void removeCollectionListener(CollectionListener<T> l);

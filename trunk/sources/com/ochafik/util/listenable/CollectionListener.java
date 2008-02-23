@@ -21,6 +21,12 @@ package com.ochafik.util.listenable;
 
 import java.util.EventListener;
 
+/**
+ * Post-modification collection event listener.
+ * @author Olivier Chafik
+ *
+ * @param <T> Type of the elements of the collections that are listened to by the listener.
+ */
 public interface CollectionListener<T> extends EventListener {
 	public void collectionChanged(CollectionEvent<T> e);
 }

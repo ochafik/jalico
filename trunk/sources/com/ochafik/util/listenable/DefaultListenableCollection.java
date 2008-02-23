@@ -24,6 +24,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
+/**
+ * Default implementation of the ListenableCollection interface.<br/>
+ * This class follows both the decorator and proxy patterns : it wraps an existing java.util.Collection and adds the listenable feature to it.<br/>
+ * @author Olivier Chafik
+ * @param <T> Type of the elements of the collection
+ */
 public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 	protected Collection<T> collection;
  	protected ListenableSupport<T> collectionSupport;
@@ -54,18 +60,15 @@ public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 		if (!collectionSupport.hasListeners())
 			return collection.addAll(c);
 		
-		boolean addedAny = false;
 		int max = c.size();
 		Collection<T> addedElements = new ArrayList<T>(max), updatedElements = new ArrayList<T>(max);
 		for (T t : c) {
-			boolean added = collection.add(t); 
-			(added ? addedElements : updatedElements).add(t);
-			addedAny = added || addedAny;
+			(collection.add(t) ? addedElements : updatedElements).add(t);
 		}
 		collectionSupport.fireAdded(this, addedElements);
 		collectionSupport.fireUpdated(this, updatedElements);
 
-		return addedAny;
+		return !addedElements.isEmpty();
 	}
 	public void clear() {
 		if (!collectionSupport.hasListeners())
@@ -83,6 +86,9 @@ public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 	}
 	@Override
 	public boolean equals(Object obj) {
+		if (obj == this)
+			return true;
+		
 		return collection.equals(obj);
 	}
 	@Override
@@ -128,36 +134,30 @@ public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 		if (!collectionSupport.hasListeners())
 			return collection.removeAll(c);
 		
-		boolean removedAny = false;
-		int max = c.size();
-		Collection<T> removedElements = new ArrayList<T>(max);
+		Collection<T> removedElements = new ArrayList<T>(c.size());
 		for (Object t : c) {
 			boolean removed = collection.remove(t);
-			if (removed) removedElements.add((T)t);
-			removedAny = removed || removedAny;
+			if (removed) 
+				removedElements.add((T)t);
 		}
 		collectionSupport.fireRemoved(this, removedElements);
 		
-		return removedAny;
+		return !removedElements.isEmpty();
 	}
 	public boolean retainAll(Collection<?> c) {
 		if (!collectionSupport.hasListeners())
 			return collection.retainAll(c);
 		
-		boolean removedAny = false;
-		int max = c.size();
-		Collection<T> removedElements = new ArrayList<T>(max);
-		
+		Collection<T> removedElements = new ArrayList<T>(c.size());
 		for (Iterator<T> it = iterator(); it.hasNext();) {
 			T e = it.next();
 			if (!c.contains(e)) {
 				it.remove();
 				removedElements.add(e);
-				removedAny = true;
 			}
 		}
 		collectionSupport.fireRemoved(this, removedElements);
-		return removedAny;
+		return !removedElements.isEmpty();
 	}
 	public int size() {
 		return collection.size();
