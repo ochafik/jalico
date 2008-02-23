@@ -51,6 +51,7 @@ public class FilteredListenableSet<T> implements ListenableSet<T>, CollectionLis
 				lastFilteredSet.add(element);
 			}
 		}
+		set.addCollectionListener(this);
 	}
 	public void collectionChanged(CollectionEvent<T> e) {
 		CollectionEvent.EventType type = e.getType();
