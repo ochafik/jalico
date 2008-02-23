@@ -43,7 +43,7 @@ import javax.swing.JScrollPane;
  * <br/>
  * Also provides a <a href="#getAdvertisedServiceInfos()">singleton read-write listenable list of advertised services</a> that can be used to announce any service on the local network.<br/>
  * <br/>  
- * Makes use of the <a href="http://jmdns.sourceforge.net/">JmDNS</a> library, that is compatible with Apple's Rendez-Vous technology (former Bonjour).<br/>
+ * Makes use of the <a href="http://jmdns.sourceforge.net/">JmDNS</a> library, that is compatible with Apple's Bonjour technology (former Rendez-Vous).<br/>
  * The constructor of this class takes a service type string as argument. You can look for existing registered service types on the page <a href="http://www.dns-sd.org/ServiceTypes.html">DNS SRV (RFC 2782) Service Types</a>.<br/>
  * Examples :
  * <ul>
