@@ -46,32 +46,54 @@ public class CollectionEvent<T> extends EventObject {
 	}
 	
 	/// Type of the event
-	EventType type;
+	protected EventType type;
 	
 	/// Elements affected by the event
-	Collection<T> elements;
+	protected Collection<T> elements;
 	
 	/// Index of the first affected element in the source, or -1 if not applicable
-	int firstIndex = -1;
+	protected int firstIndex = -1;
 	
 	/// Index of the last affected element in the source, or -1 if not applicable
-	int lastIndex = -1;
+	protected int lastIndex = -1;
 	
 	@SuppressWarnings("unchecked")
+	/**
+	 * Get the source of the event
+	 * @return listenable collection where the event originated from
+	 */
 	public ListenableCollection<T> getSource() {
 		return (ListenableCollection<T>)super.getSource();
 	}
 	
+	/**
+	 * Get the event type
+	 * @return type of the event
+	 */
 	public EventType getType() {
 		return type;
 	}
+	
+	/**
+	 * Get the elements affected by the event.
+	 * @return the elements affected by the event.
+	 */
 	public Collection<T> getElements() {
 		return elements;
 	}
 	
+	/**
+	 * Get the index of the first affected element in the source, or -1 if not applicable
+	 * @return Index of the first affected element in the source, or -1 if not applicable
+	 */
 	public int getFirstIndex() {
 		return firstIndex;
 	}
+	
+	/**
+	 * Get the index of the last affected element in the source, or -1 if not applicable
+	 * @return Index of the last affected element in the source, or -1 if not applicable
+	 */
 	public int getLastIndex() {
 		return lastIndex;
 	}

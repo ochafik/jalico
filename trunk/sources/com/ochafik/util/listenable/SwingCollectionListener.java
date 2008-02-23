@@ -21,6 +21,11 @@ package com.ochafik.util.listenable;
 
 import javax.swing.SwingUtilities;
 
+/**
+ * Collection listener proxy that forwards in the event dispatch thread all the events it receives.  
+ * @author Olivier Chafik
+ * @param <T> type of the elements of the collections that are listened to by this listener
+ */
 public class SwingCollectionListener<T> implements CollectionListener<T> {
 	final CollectionListener<T> listener;
 	

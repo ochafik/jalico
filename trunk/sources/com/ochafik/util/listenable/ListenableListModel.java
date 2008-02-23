@@ -22,9 +22,10 @@ package com.ochafik.util.listenable;
 import javax.swing.AbstractListModel;
 
 /**
- * Swing list model that dynamically reflects the contents of a listenable list.<br/>
+ * Swing list model (for use by JList) that dynamically reflects the contents of a listenable list.<br/>
  * This model safely propagates events from the listenable list to any registered ListDataListener within the event dispatch thread, even if the events were received from an other thread.
  * @see javax.swing.event.ListDataListener
+ * @see javax.swing.JList
  * @see com.ochafik.util.listenable.SwingCollectionListener 
  * @author Olivier Chafik
  * @param <T> Type of the elements of the list

@@ -37,6 +37,23 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 
+/**
+ * List of <a href="http://www.zeroconf.org/">ZeroConf</a> services discovered over the network.<br/>
+ * <img src="zeroconfList.png" alt="Example run of this class, using the iTunes share service type string"/><br/>
+ * <br/>
+ * Also provides a singleton listenable list of advertised services that can be used to announce any service on the local network.<br/>
+ * <br/>  
+ * Makes use of the <a href="http://jmdns.sourceforge.net/">JmDNS</a> library, that is compatible with Apple's Rendez-Vous technology (former Bonjour).<br/>
+ * The constructor of this class takes a service type string as argument. You can look for existing registered service types on the page <a href="http://www.dns-sd.org/ServiceTypes.html">DNS SRV (RFC 2782) Service Types</a>.<br/>
+ * Examples :
+ * <ul>
+ * <li>"_MyTestProtocol._tcp.local." for your tests
+ * </li><li>"_daap._tcp" for the iTunes music shares discovery
+ * </li>
+ * </ul>
+ * 
+ * @author Olivier Chafik
+ */
 public class ZeroConfListenableMap extends DefaultListenableMap<String, ServiceInfo> implements ServiceListener {
 	String typeString;
 	
@@ -116,11 +133,12 @@ public class ZeroConfListenableMap extends DefaultListenableMap<String, ServiceI
 	}
 	
 	public static void main(String[] args) {
-		String key = "_zOlive._tcp.local.";
+		//String key = "_zOlive._tcp.local.";
+		String key = "_daap._tcp.local.";
 		ZeroConfListenableMap map = new ZeroConfListenableMap(key);
 		JFrame f = new JFrame(key);
 		f.getContentPane().add("Center", new JScrollPane(new JList(new ListenableListModel<String>(ListenableCollections.asList(map.keySet())))));
-		f.setSize(200, 600);
+		f.setSize(200, 400);
 		f.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -134,7 +152,7 @@ public class ZeroConfListenableMap extends DefaultListenableMap<String, ServiceI
 		
 		Random random = new Random();
 		for (int i = 5; i-- != 0;) {
-			String name = "Agent " + random.nextInt();
+			String name = "Fake iTunes library " + random.nextInt();
 			getAdvertisedServiceInfos().put(name, new ServiceInfo(key, name, 11, "fuck !"));
 		}
 	}
