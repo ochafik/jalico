@@ -40,17 +40,17 @@ import javax.swing.table.AbstractTableModel;
  * <p>
  * For instance, if you want to display a list of files, you might do the following :<br/>
  * <code><pre>
- * 	ListenableList<File> filesList = new DefaultListenableList<File>(Arrays.asList(new File(".").listFiles()));
- * 	ListenableTableModel<File> tableModel = new ListenableTableModel<File>(filesList);
- * 	tableModel.addColumnAdapter(new Adapter<File,Object>() {
+ * 	ListenableList&lt;File&gt; filesList = new DefaultListenableList&lt;File&gt;(new ArrayList&lt;File&gt;(Arrays.asList(new File(".").listFiles())));
+ * 	ListenableTableModel&lt;File&gt; tableModel = new ListenableTableModel&lt;File&gt;(filesList);
+ * 	tableModel.addColumnAdapter(new Adapter&lt;File,Object&gt;() {
  * 		public String toString() { return "File Name"; } 
  * 		public Object adapt(File file) { return file.getName(); }
  * 	});
- * 	tableModel.addColumnAdapter(new Adapter<File,Object>() {
+ * 	tableModel.addColumnAdapter(new Adapter&lt;File,Object&gt;() {
  * 		public String toString() { return "Size"; } 
  * 		public Object adapt(File file) { return file.length(); }
  * 	});
- * 	tableModel.addColumnAdapter(new Adapter<File,Object>() {
+ * 	tableModel.addColumnAdapter(new Adapter&lt;File,Object&gt;() {
  * 		public String toString() { return "Last Modification"; } 
  *		public Object adapt(File file) { return new Date(file.lastModified()); }
  *	});
@@ -139,7 +139,7 @@ public class ListenableTableModel<T> extends AbstractTableModel {
 	}
 
 	public static void main(String[] args) {
-		ListenableList<File> filesList = new DefaultListenableList<File>(Arrays.asList(new File(".").listFiles()));
+		ListenableList<File> filesList = new DefaultListenableList<File>(new ArrayList<File>(Arrays.asList(new File(".").listFiles())));
 		ListenableTableModel<File> tableModel = new ListenableTableModel<File>(filesList);
 		tableModel.addColumnAdapter(new Adapter<File,Object>() {
 			public String toString() { return "File Name"; } 
@@ -159,5 +159,6 @@ public class ListenableTableModel<T> extends AbstractTableModel {
 		frame.pack();
 		frame.setVisible(true);
 
+		
 	}
 }
