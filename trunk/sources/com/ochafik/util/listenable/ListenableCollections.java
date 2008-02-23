@@ -25,50 +25,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
-
+/**
+ * Utility methods to make the most out of listenable collections.<br/>
+ * Provides synchronized and read-only wrappers for listenable collections, lists, sets and maps.<br/>
+ * Also provides two-ways automated synchronization between listenable collections (that "knows" about the differences between sets, lists and other kinds of collections).
+ * @author ochafik
+ *
+ */
 public class ListenableCollections {
-	public static final <T> ListenableSet<T> unmodifiableSet(ListenableSet<T> set) {
-		return new UnmodifiableListenableSet<T>(set);
-	}
-	
-	public static final <T> ListenableCollection<T> unmodifiableCollection(ListenableCollection<T> col) {
-		return new UnmodifiableListenableCollection<T>(col);
-	}
-	
-	public static final <K,V> ListenableMap<K,V> unmodifiableMap(ListenableMap<K,V> map) {
-		return new UnmodifiableListenableMap<K,V>(map);
-	}
-	
-	public static final <T> ListenableSet<T> synchronizedSet(ListenableSet<T> set) {
-		return new SynchronizedListenableSet<T>(set);
-	}
-	
-	public static final <T> ListenableCollection<T> synchronizedCollection(ListenableCollection<T> col) {
-		return new SynchronizedListenableCollection<T>(col);
-	}
-	
-	public static final <K,V> ListenableMap<K,V> synchronizedMap(ListenableMap<K,V> map) {
-		return new SynchronizedListenableMap<K,V>(map);
-	}
-	
-	public static final <T> ListenableCollection<T> listenableCollection(Collection<T> x) {
-		return new DefaultListenableCollection<T>(x);
-	}
-	
-	public static final <T> ListenableSet<T> listenableSet(Set<T> x) {
-		return new DefaultListenableSet<T>(x);
-	}
-	
-	public static final <K,V> ListenableMap<K,V> listenableMap(Map<K,V> x) {
-		return new DefaultListenableMap<K,V>(x);
-	}
-	
-	public static <T> ListenableList<T> asList(ListenableSet<T> source) {
+	/**
+	 * Create a listenable list that will dynamically reflect the contents of the source listenable collection.<br/>
+	 * This is useful for instance when you want to put the contents of a set in a swing JList (then use new JList(new ListenableListModel(ListenableCollections.asList(yourSet)))). 
+	 * @param <T> type of the elements of the collection
+	 * @param source collection that is to be adapted to a listenable list
+	 * @return source if it is already a listenable list, otherwise a new listenable list that is two-ways bound to the source collection. 
+	 */
+	public static <T> ListenableList<T> asList(ListenableCollection<T> source) {
+		if (source instanceof ListenableList)
+			return (ListenableList<T>)source;
+		
 		ListenableList<T> out = new DefaultListenableList<T>(new ArrayList<T>());
 		bind(source, out);
 		return out;
 	}
+	
+	/**
+	 * Setup two-ways automated synchronization between listenable collections<br/>
+	 * Tries to deal with sets, lists and collections in the most intuitive way possible (synchronization should happen as the common sense would dictate it).<br/>
+	 * It is possible to bind collections of different kinds (say, a set with a list).
+ 	 * @param <T> type of the elements of both collections
+	 * @param a collection to keep synchronized with b
+	 * @param b collection to keep synchronized with a
+	 */
 	public static <T> void bind(final ListenableCollection<T> a, final ListenableCollection<T> b) {
 		CollectionListener<T> listener = new CollectionListener<T>() {
 			boolean currentlyPropagating = false;
@@ -114,5 +102,45 @@ public class ListenableCollections {
 		};
 		a.addCollectionListener(listener);
 		b.addCollectionListener(listener);
+	}
+	
+	public static final <T> ListenableSet<T> unmodifiableSet(ListenableSet<T> set) {
+		return new UnmodifiableListenableSet<T>(set);
+	}
+	
+	public static final <T> ListenableCollection<T> unmodifiableCollection(ListenableCollection<T> col) {
+		return new UnmodifiableListenableCollection<T>(col);
+	}
+	
+	public static final <K,V> ListenableMap<K,V> unmodifiableMap(ListenableMap<K,V> map) {
+		return new UnmodifiableListenableMap<K,V>(map);
+	}
+	
+	public static final <T> ListenableSet<T> synchronizedSet(ListenableSet<T> set) {
+		return new SynchronizedListenableSet<T>(set);
+	}
+	
+	public static final <T> ListenableCollection<T> synchronizedCollection(ListenableCollection<T> col) {
+		return new SynchronizedListenableCollection<T>(col);
+	}
+	
+	public static final <K,V> ListenableMap<K,V> synchronizedMap(ListenableMap<K,V> map) {
+		return new SynchronizedListenableMap<K,V>(map);
+	}
+	
+	public static final <T> ListenableCollection<T> listenableCollection(Collection<T> x) {
+		return new DefaultListenableCollection<T>(x);
+	}
+	
+	public static final <T> ListenableList<T> listenableList(List<T> x) {
+		return new DefaultListenableList<T>(x);
+	}
+	
+	public static final <T> ListenableSet<T> listenableSet(Set<T> x) {
+		return new DefaultListenableSet<T>(x);
+	}
+	
+	public static final <K,V> ListenableMap<K,V> listenableMap(Map<K,V> x) {
+		return new DefaultListenableMap<K,V>(x);
 	}
 }

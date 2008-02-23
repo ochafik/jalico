@@ -33,9 +33,9 @@ import java.util.ListIterator;
  */
 public class DefaultListenableList<T> extends DefaultListenableCollection<T> implements ListenableList<T>{
 	List<T> list;
-	public DefaultListenableList(List<T> list) {
-		super(list);
-		this.list = list;
+	public DefaultListenableList(List<T> ilistst) {
+		super(ilistst);
+		this.list = ilistst;
 	}
 	public DefaultListenableList(List<T> list, ListenableSupport<T> collectionSupport) {
 		super(list,collectionSupport);
