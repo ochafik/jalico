@@ -21,9 +21,12 @@ package com.ochafik.util.listenable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Utility methods to make the most out of listenable collections.<br/>
@@ -44,7 +47,7 @@ public class ListenableCollections {
 		if (source instanceof ListenableList)
 			return (ListenableList<T>)source;
 		
-		ListenableList<T> out = new DefaultListenableList<T>(new ArrayList<T>());
+		ListenableList<T> out = new DefaultListenableList<T>(new ArrayList<T>(source));
 		bind(source, out);
 		return out;
 	}
@@ -62,6 +65,27 @@ public class ListenableCollections {
 			boolean currentlyPropagating = false;
 			
 			@SuppressWarnings("unchecked")
+			void add(T t, ListenableCollection<T> source, ListenableCollection<T> recipient) {
+				if ((recipient instanceof List) && (source instanceof SortedSet)) {
+					ListenableList<T> recipientList = (ListenableList<T>)recipient;
+					Comparator<T> comparator = (Comparator<T>) ((SortedSet)source).comparator();
+					int i;
+					if (comparator != null) {
+						i = Collections.binarySearch(recipientList, t, comparator);
+					} else {
+						// Assume T is comparable
+						i = Collections.binarySearch((List)recipientList, t);
+					}
+					if (i >= 0) {
+						recipientList.set(i, t);
+					} else {
+						recipientList.add(-i - 1, t);
+					}
+				} else {
+					recipient.add(t);
+				}
+			}
+			@SuppressWarnings("unchecked")
 			public void collectionChanged(CollectionEvent<T> e) {
 				// Avoid infinite propagation of events
 				if (currentlyPropagating) 
@@ -70,12 +94,12 @@ public class ListenableCollections {
 				//System.out.println("Propagating "+e.getType() + " for elements "+e.getElements());
 				try {
 					currentlyPropagating = true;
-					ListenableCollection<T> recipient = e.getSource() == a ? b : a;
+					ListenableCollection<T> source = e.getSource(), recipient = source == a ? b : a;
 					
 					for (T t : e.getElements()) {
 						switch (e.getType()) {
 						case ADDED:
-							recipient.add(t);
+							add(t, source, recipient);
 							break;
 						case REMOVED:
 							recipient.remove(t);
@@ -86,11 +110,11 @@ public class ListenableCollections {
 								int i = recipientList.indexOf(t);
 								recipientList.set(i, t);
 							} else if (recipient instanceof Set) {
-								recipient.add(t);
+								add(t, source, recipient);
 							} else {
 								// Add might do a duplicate, so first remove element.
 								recipient.remove(t);
-								recipient.add(t);
+								add(t, source, recipient);
 							}
 							break;
 						}
@@ -137,6 +161,9 @@ public class ListenableCollections {
 	}
 	
 	public static final <T> ListenableSet<T> listenableSet(Set<T> x) {
+		if (x instanceof SortedSet) {
+			return new DefaultListenableSortedSet<T>((SortedSet<T>)x);
+		}
 		return new DefaultListenableSet<T>(x);
 	}
 	

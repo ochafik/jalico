@@ -19,19 +19,39 @@
 */
 package com.ochafik.util.listenable;
 
+import java.util.Comparator;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
- * Default implementation of the ListenableSet interface.<br/>
+ * Default implementation of the ListenableSet and SortedSet interface.<br/>
  * This class follows both the decorator and proxy patterns : it wraps an existing java.util.Set and adds the listenable feature to it.<br/>
  * @author Olivier Chafik
  * @param <T> Type of the elements of the set
  */
-class DefaultListenableSet<T> extends DefaultListenableCollection<T> implements ListenableSet<T> {
-	public DefaultListenableSet(Set<T> set, ListenableSupport<T> collectionSupport) {
+class DefaultListenableSortedSet<T> extends DefaultListenableSet<T> implements ListenableSortedSet<T> {
+	public DefaultListenableSortedSet(SortedSet<T> set, ListenableSupport<T> collectionSupport) {
 		super(set,collectionSupport);
 	}
-	public DefaultListenableSet(Set<T> set) {
+	public DefaultListenableSortedSet(SortedSet<T> set) {
 		super(set);
+	}
+	public Comparator<? super T> comparator() {
+		return ((SortedSet<T>)collection).comparator();
+	}
+	public T first() {
+		return ((SortedSet<T>)collection).first();
+	}
+	public SortedSet<T> headSet(T toElement) {
+		return ((SortedSet<T>)collection).headSet(toElement);
+	}
+	public T last() {
+		return ((SortedSet<T>)collection).last();
+	}
+	public SortedSet<T> subSet(T fromElement, T toElement) {
+		return ((SortedSet<T>)collection).subSet(fromElement, toElement);
+	}
+	public SortedSet<T> tailSet(T fromElement) {
+		return ((SortedSet<T>)collection).tailSet(fromElement);
 	}	
 }
