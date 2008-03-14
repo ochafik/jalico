@@ -1,9 +1,9 @@
 #!/bin/bash
 
 find sources -iname "*.java" > .list.tmp
-svn update && javadoc -d javadoc/ -classpath sources/:/Users/ochafik/Prog/Java/libraries/jmdns.jar @.list.tmp
+svn update && javadoc -link http://ochafik.free.fr/Java/javadoc/jmdns/ -link http://java.sun.com/javase/6/docs/api/ -d javadoc/ -classpath sources/:/Users/ochafik/Prog/Java/libraries/jmdns.jar @.list.tmp
 
-find javadoc/ -iname "*.html" -exec svn add '{}' ';'
+find javadoc/ -iname "*.html" -exec svn add '{}' ';' 2> /dev/null
 	
 # See http://stuffthathappens.com/blog/2007/11/09/howto-publish-javadoc-on-google-code/
 if [[ ! -z "$RETAG" ]] ; then
