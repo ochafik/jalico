@@ -22,13 +22,13 @@ package com.ochafik.util.listenable;
 import java.util.Map;
 
 /**
- * Interface for maps which key set supports modification listeners.<br/>
- * TODO also require that the entry set is listenable
+ * Interface for maps which key set, entry set and values collection support modification listeners.<br/>
  * @author Olivier Chafik
  * @param <K> Type of the keys of the map
  * @param <V> Type of the values of the map
  */
 public interface ListenableMap<K,V> extends Map<K,V> {
 	public ListenableSet<K> keySet();
-	//public ListenableSet<Map.Entry<K,V>> entrySet();
+	public ListenableSet<Map.Entry<K,V>> entrySet();
+	public ListenableCollection<V> values();
 }

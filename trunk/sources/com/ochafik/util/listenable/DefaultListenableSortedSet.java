@@ -20,7 +20,6 @@
 package com.ochafik.util.listenable;
 
 import java.util.Comparator;
-import java.util.Set;
 import java.util.SortedSet;
 
 /**

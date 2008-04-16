@@ -71,9 +71,10 @@ public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 		return !addedElements.isEmpty();
 	}
 	public void clear() {
-		if (!collectionSupport.hasListeners())
+		if (!collectionSupport.hasListeners()) {
 			collection.clear();
-			
+			return;
+		}
 		Collection<T> copy = new ArrayList<T>(collection);
 		collection.clear();
 		collectionSupport.fireRemoved(this, copy);
@@ -98,27 +99,29 @@ public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 	public boolean isEmpty() {
 		return collection.isEmpty();
 	}
+	
+	protected class ListenableIterator implements Iterator<T> {
+		Iterator<T> iterator;
+		T lastValue;
+		DefaultListenableCollection<T> listenableCollection;
+		public ListenableIterator(DefaultListenableCollection<T> listenableCollection,Iterator<T> iterator) {
+			this.iterator = iterator;
+			this.listenableCollection = listenableCollection;
+		}
+		public boolean hasNext() {
+			return iterator.hasNext();
+		}
+		public T next() {
+			lastValue = iterator.next();
+			return lastValue;
+		}
+		public void remove() {
+			iterator.remove();
+			collectionSupport.fireRemoved(listenableCollection,Collections.singleton(lastValue));
+		}
+	};
+	
 	public Iterator<T> iterator() {
-		final class ListenableIterator implements Iterator<T> {
-			Iterator<T> iterator;
-			T lastValue;
-			DefaultListenableCollection<T> listenableCollection;
-			public ListenableIterator(DefaultListenableCollection<T> listenableCollection,Iterator<T> iterator) {
-				this.iterator = iterator;
-				this.listenableCollection = listenableCollection;
-			}
-			public boolean hasNext() {
-				return iterator.hasNext();
-			}
-			public T next() {
-				lastValue = iterator.next();
-				return lastValue;
-			}
-			public void remove() {
-				iterator.remove();
-				collectionSupport.fireRemoved(listenableCollection,Collections.singleton(lastValue));
-			}
-		};
 		return new ListenableIterator(this,collection.iterator());
 	}
 	@SuppressWarnings("unchecked")

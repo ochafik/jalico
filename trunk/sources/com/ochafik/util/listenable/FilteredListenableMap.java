@@ -16,18 +16,16 @@
    This file comes from the Jalico project (Java Listenable Collections)
 
        http://jalico.googlecode.com/.
-*/
+ */
 package com.ochafik.util.listenable;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 
 class FilteredListenableMap<K, V> implements ListenableMap<K, V> {
 	ListenableMap<K, V> listenableMap;
 
-	
+
 	public FilteredListenableMap(ListenableMap<K, V> listenableMap) {
 		this.listenableMap = listenableMap;
 	}
@@ -37,64 +35,65 @@ class FilteredListenableMap<K, V> implements ListenableMap<K, V> {
 	}
 
 	public boolean containsKey(Object key) {
-		
+
 		return listenableMap.containsKey(key);
 	}
 
 	public boolean containsValue(Object value) {
-		
+
 		return listenableMap.containsValue(value);
 	}
 
-	public Set<Entry<K, V>> entrySet() {
-		
+	public ListenableSet<Entry<K, V>> entrySet() {
+
 		return listenableMap.entrySet();
 	}
 
+
 	public V get(Object key) {
-		
+
 		return listenableMap.get(key);
 	}
 
 	public boolean isEmpty() {
-		
+
 		return listenableMap.isEmpty();
 	}
 
 	public ListenableSet<K> keySet() {
-		
+
 		return listenableMap.keySet();
 	}
 
 	public V put(K key, V value) {
-		
+
 		return listenableMap.put(key, value);
 	}
 
 	public void putAll(Map<? extends K, ? extends V> t) {
 		listenableMap.putAll(t);
-		
+
 	}
 
 	public V remove(Object key) {
-		
+
 		return listenableMap.remove(key);
 	}
 
 	public int size() {
-		
+
 		return listenableMap.size();
 	}
 
-	public Collection<V> values() {
-		
+	public ListenableCollection<V> values() {
+
 		return listenableMap.values();
 	}
 
 	public ListenableSet<K> listenableKeySet() {
-		
+
 		return listenableMap.keySet();
 	}
-	
-	
+
+
 }

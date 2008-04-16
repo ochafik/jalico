@@ -19,10 +19,7 @@
 */
 package com.ochafik.util.listenable;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
-
 
 class SynchronizedListenableMap<K,V> extends DefaultListenableMap<K,V> {
 	Object mutex;
@@ -57,7 +54,7 @@ class SynchronizedListenableMap<K,V> extends DefaultListenableMap<K,V> {
  		}
  	}
  	@Override
- 	public Set<Entry<K, V>> entrySet() {
+ 	public ListenableSet<Entry<K, V>> entrySet() {
  		synchronized (mutex) {
  			return new SynchronizedListenableSet<Entry<K,V>>(super.entrySet(), mutex);
  		}
@@ -124,7 +121,7 @@ class SynchronizedListenableMap<K,V> extends DefaultListenableMap<K,V> {
  		}
  	}
  	@Override
- 	public Collection<V> values() {
+ 	public ListenableCollection<V> values() {
  		synchronized (mutex) {
  			return new SynchronizedListenableCollection<V>(super.values());
  		}

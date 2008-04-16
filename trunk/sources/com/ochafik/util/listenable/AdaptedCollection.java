@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * ListenableCollection&lt;V&gt; that wraps a Collection&lt;U&gt;, using adapters from U to V (and optionnally backwards, for support of the add(V) method).<br/>
+ * ListenableCollection&lt;V&gt; that wraps a Collection&lt;U&gt;, using adapters from U to V (and optionally backwards, for support of the add(V) method).<br/>
  * If the wrapped collection implements ListenableCollection, all its events will be adapted and propagated to listeners of the AdaptedCollection.<br/> 
  * This is useful to convert a collection to another type<br/>
  * The resulting wrapped collection is listenable, and listens to modifications of its wrapped collection if it is an instance of ListenableCollection.
@@ -38,7 +38,7 @@ public class AdaptedCollection<U, V> extends AbstractCollection<V> implements Li
 	protected final Collection<U> collection;
 	protected final Adapter<U,V> forwardAdapter;
 	protected final Adapter<V,U> backwardAdapter;
-	protected final ListenableSupport<V> collectionSupport = new ListenableSupport<V>();
+	protected ListenableSupport<V> collectionSupport;
 	protected boolean currentlyCausingChange = false;
 	
 	public AdaptedCollection(Collection<U> collection, Adapter<U, V> forwardAdapter) {
@@ -54,28 +54,6 @@ public class AdaptedCollection<U, V> extends AbstractCollection<V> implements Li
 		this.collection = collection;
 		this.forwardAdapter = forwardAdapter;
 		this.backwardAdapter = backwardAdapter;
-		
-		if (collection instanceof ListenableCollection) {
-			((ListenableCollection<U>)collection).addCollectionListener(new CollectionListener<U>() {
-				public void collectionChanged(CollectionEvent<U> e) {
-					// Do not propagate the event if we triggered it
-					if (currentlyCausingChange)
-						return;
-					
-					// Only propagate if someone is listening (CollectionSupport already tries not to fire anything when there is no listener, but here we are trying to avoid to create the wrapped elements collection)
-					if (!collectionSupport.hasListeners())
-						return;
-					
-					// Adapt the collection of changed / added / removed elements in the event
-					collectionSupport.fireEvent(
-						AdaptedCollection.this, 
-						new AdaptedCollection<U, V>(e.getElements(), AdaptedCollection.this.forwardAdapter, AdaptedCollection.this.backwardAdapter), 
-						e.getType(), 
-						e.getFirstIndex(), 
-						e.getLastIndex());
-				}
-			});
-		}
 	}
 	
 	public Adapter<U, V> getForwardAdapter() {
@@ -103,14 +81,17 @@ public class AdaptedCollection<U, V> extends AbstractCollection<V> implements Li
 	
 	@Override
 	public void clear() {
-		Collection<V> elements = collectionSupport.hasListeners() ? new ArrayList<V>(AdaptedCollection.this) : null;
-		try {
-			currentlyCausingChange = true;
+		if (collectionSupport != null && collectionSupport.hasListeners()) {
+			try {
+				currentlyCausingChange = true;
+				Collection<V> removedElements = new ArrayList<V>(AdaptedCollection.this);
+				collection.clear();
+				collectionSupport.fireRemoved(AdaptedCollection.this, removedElements, 0, removedElements.size() - 1);
+			} finally {
+				currentlyCausingChange = false;
+			}
+		} else {
 			collection.clear();
-			if (elements != null)
-				collectionSupport.fireRemoved(AdaptedCollection.this, elements, 0, elements.size() - 1);
-		} finally {
-			currentlyCausingChange = false;
 		}
 	}
 	
@@ -122,7 +103,9 @@ public class AdaptedCollection<U, V> extends AbstractCollection<V> implements Li
 		try {
 			currentlyCausingChange = true;
 			if (collection.add(backwardAdapter.adapt(value))) {
-				collectionSupport.fireAdded(this, Collections.singleton(value));
+				if (collectionSupport != null && collectionSupport.hasListeners())
+					collectionSupport.fireAdded(this, Collections.singleton(value));
+				
 				return true;
 			}
 			return false;
@@ -143,7 +126,9 @@ public class AdaptedCollection<U, V> extends AbstractCollection<V> implements Li
 					try {
 						currentlyCausingChange = true;
 						it.remove();
-						collectionSupport.fireRemoved(this, (Collection<V>)Collections.singleton(value), i, i);
+						if (collectionSupport != null && collectionSupport.hasListeners())
+							collectionSupport.fireRemoved(this, (Collection<V>)Collections.singleton(value), i, i);
+						
 						return true;
 					} finally {
 						currentlyCausingChange = false;
@@ -162,7 +147,9 @@ public class AdaptedCollection<U, V> extends AbstractCollection<V> implements Li
 		try {
 			currentlyCausingChange = true;
 			if (collection.remove(backwardAdapter.adapt((V)value))) {
-				collectionSupport.fireRemoved(this, (Collection<V>)Collections.singleton(value));
+				if (collectionSupport != null && collectionSupport.hasListeners())
+					collectionSupport.fireRemoved(this, (Collection<V>)Collections.singleton(value));
+				
 				return true;
 			}
 			return false;
@@ -202,7 +189,9 @@ public class AdaptedCollection<U, V> extends AbstractCollection<V> implements Li
 			try {
 				currentlyCausingChange = true;
 				iterator.remove();
-				collectionSupport.fireRemoved(AdaptedCollection.this, Collections.singleton(lastValue));
+				
+				if (collectionSupport != null && collectionSupport.hasListeners())
+					collectionSupport.fireRemoved(AdaptedCollection.this, Collections.singleton(lastValue));
 			} finally {
 				currentlyCausingChange = false;
 			}
@@ -211,6 +200,31 @@ public class AdaptedCollection<U, V> extends AbstractCollection<V> implements Li
 	}
 	
 	public void addCollectionListener(CollectionListener<V> l) {
+		if (collectionSupport == null) {
+			collectionSupport = new ListenableSupport<V>();
+			if (collection instanceof ListenableCollection) {
+				((ListenableCollection<U>)collection).addCollectionListener(new CollectionListener<U>() {
+					public void collectionChanged(CollectionEvent<U> e) {
+						// Do not propagate the event if we triggered it
+						if (currentlyCausingChange)
+							return;
+						
+						// Only propagate if someone is listening (CollectionSupport already tries not to fire anything when there is no listener, but here we are trying to avoid to create the wrapped elements collection)
+						if (collectionSupport == null || !collectionSupport.hasListeners())
+							return;
+						
+						// Adapt the collection of changed / added / removed elements in the event
+						collectionSupport.fireEvent(
+							AdaptedCollection.this, 
+							new AdaptedCollection<U, V>(e.getElements(), AdaptedCollection.this.forwardAdapter, AdaptedCollection.this.backwardAdapter), 
+							e.getType(), 
+							e.getFirstIndex(), 
+							e.getLastIndex());
+					}
+				});
+			}
+		}
+				
 		collectionSupport.addCollectionListener(l);
 	}
 	

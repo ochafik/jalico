@@ -31,6 +31,8 @@ import javax.swing.AbstractListModel;
  * @param <T> Type of the elements of the list
  */
 public class ListenableListModel<T> extends AbstractListModel {
+	private static final long serialVersionUID = 1794077239948305400L;
+	
 	private ListenableList<T> list;
 	
 	public ListenableListModel(ListenableList<T> list) {

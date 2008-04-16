@@ -170,4 +170,5 @@ public class ListenableCollections {
 	public static final <K,V> ListenableMap<K,V> listenableMap(Map<K,V> x) {
 		return new DefaultListenableMap<K,V>(x);
 	}
+	
 }

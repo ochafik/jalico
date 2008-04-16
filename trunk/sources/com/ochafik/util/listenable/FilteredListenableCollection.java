@@ -19,22 +19,43 @@
 */
 package com.ochafik.util.listenable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
 class FilteredListenableCollection<T> implements ListenableCollection<T> {
 	protected final ListenableCollection<T> listenableCollection;
+	protected Collection<CollectionListener<T>> listeners;
 
 	public FilteredListenableCollection(ListenableCollection<T> listenableCollection) {
 		this.listenableCollection = listenableCollection;
+		
 	}
 
 	public void addCollectionListener(CollectionListener<T> l) {
-		listenableCollection.addCollectionListener(l);
+		if (listeners == null) {
+			listeners = new ArrayList<CollectionListener<T>>();
+			listenableCollection.addCollectionListener(new CollectionListener<T>() {
+				public void collectionChanged(CollectionEvent<T> e) {
+					if (listeners != null && !listeners.isEmpty()) {
+						Collection<T> filteredElements = e.getElements();
+						CollectionEvent<T> filteredEvent = new CollectionEvent<T>(FilteredListenableCollection.this, filteredElements, e.getType(), e.getFirstIndex(), e.getLastIndex());
+						for (CollectionListener<T> listener : listeners) {
+							listener.collectionChanged(filteredEvent);
+						}
+					}
+				}
+			});
+		}
+		
+		listeners.add(l);
 	}
 
 	public void removeCollectionListener(CollectionListener<T> l) {
-		listenableCollection.removeCollectionListener(l);
+		if (listeners == null)
+			return;
+		
+		listeners.remove(l);
 	}
 
 	public boolean add(T o) {

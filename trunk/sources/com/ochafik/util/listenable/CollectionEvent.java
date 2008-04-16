@@ -38,6 +38,9 @@ import java.util.EventObject;
  * @param <T> Type of the elements of the collection from which the event originated
  */
 public class CollectionEvent<T> extends EventObject {
+	
+	private static final long serialVersionUID = -5266364113759541622L;
+
 	/// Type of the event. 
 	public enum EventType {
 		ADDED, 
@@ -46,16 +49,16 @@ public class CollectionEvent<T> extends EventObject {
 	}
 	
 	/// Type of the event
-	protected EventType type;
+	protected final EventType type;
 	
 	/// Elements affected by the event
-	protected Collection<T> elements;
+	protected final Collection<T> elements;
 	
 	/// Index of the first affected element in the source, or -1 if not applicable
-	protected int firstIndex = -1;
+	protected final int firstIndex;
 	
 	/// Index of the last affected element in the source, or -1 if not applicable
-	protected int lastIndex = -1;
+	protected final int lastIndex;
 	
 	@SuppressWarnings("unchecked")
 	/**
@@ -97,12 +100,12 @@ public class CollectionEvent<T> extends EventObject {
 	public int getLastIndex() {
 		return lastIndex;
 	}
-	public CollectionEvent(ListenableCollection<T> source,Collection<T> elements, EventType type) {
-		super(source);
-		this.elements = elements;
-		this.type = type;
+	
+	public CollectionEvent(ListenableCollection<T> source, Collection<T> elements, EventType type) {
+		this(source, elements, type, -1, -1);
 	}
-	public CollectionEvent(ListenableCollection<T> source,Collection<T> elements, EventType type, int firstIndex, int lastIndex) {
+	
+	public CollectionEvent(ListenableCollection<T> source, Collection<T> elements, EventType type, int firstIndex, int lastIndex) {
 		super(source);
 		this.elements = elements;
 		this.type = type;

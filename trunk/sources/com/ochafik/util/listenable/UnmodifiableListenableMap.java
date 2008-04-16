@@ -19,9 +19,7 @@
 */
 package com.ochafik.util.listenable;
 
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 
 class UnmodifiableListenableMap<K, V> extends FilteredListenableMap<K, V>{
@@ -35,8 +33,12 @@ class UnmodifiableListenableMap<K, V> extends FilteredListenableMap<K, V>{
 		throw new UnsupportedOperationException("Unmodifiable map !");
 	}
 	@Override
-	public Set<Entry<K, V>> entrySet() {
-		return Collections.unmodifiableSet(listenableMap.entrySet());
+	public ListenableSet<Entry<K, V>> entrySet() {
+		return ListenableCollections.unmodifiableSet(listenableMap.entrySet());
+	}
+	@Override
+	public ListenableCollection<V> values() {
+		return ListenableCollections.unmodifiableCollection(listenableMap.values());
 	}
 	@Override
 	public ListenableSet<K> keySet() {

@@ -45,7 +45,7 @@ public class ListenableSupport<T> {
 	}
 
 	public boolean hasListeners() {
-		return !listeners.isEmpty();
+		return listeners != null && !listeners.isEmpty();
 	}
 	
 	public void fireEvent(ListenableCollection<T> source, Collection<T> elements, CollectionEvent.EventType type, int firstIndex, int lastIndex) {
