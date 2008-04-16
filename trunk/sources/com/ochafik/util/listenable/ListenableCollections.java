@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.RandomAccess;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -153,10 +154,23 @@ public class ListenableCollections {
 	}
 	
 	public static final <T> ListenableCollection<T> listenableCollection(Collection<T> x) {
+		if (x instanceof Set) {
+			return listenableSet((Set<T>)x);
+		} else if (x instanceof List) {
+			return listenableList((List<T>)x);
+		}
 		return new DefaultListenableCollection<T>(x);
 	}
 	
 	public static final <T> ListenableList<T> listenableList(List<T> x) {
+		if (x instanceof RandomAccess) {
+			class RandomAccessListenableList extends DefaultListenableList<T> implements RandomAccess {
+				public RandomAccessListenableList(List<T> l) {
+					super(l);
+				}
+			};
+			return new RandomAccessListenableList(x);
+		}
 		return new DefaultListenableList<T>(x);
 	}
 	
