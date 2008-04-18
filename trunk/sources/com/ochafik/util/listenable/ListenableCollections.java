@@ -37,6 +37,7 @@ import java.util.SortedSet;
  *
  */
 public class ListenableCollections {
+	
 	/**
 	 * Create a listenable list that will dynamically reflect the contents of the source listenable collection.<br/>
 	 * This is useful for instance when you want to put the contents of a set in a swing JList (then use new JList(new ListenableListModel(ListenableCollections.asList(yourSet)))). 
@@ -153,32 +154,68 @@ public class ListenableCollections {
 		return new SynchronizedListenableMap<K,V>(map);
 	}
 	
-	public static final <T> ListenableCollection<T> listenableCollection(Collection<T> x) {
-		if (x instanceof Set) {
-			return listenableSet((Set<T>)x);
-		} else if (x instanceof List) {
-			return listenableList((List<T>)x);
+	/**
+	 * Wraps a collection in a listenable collection.<br/>
+	 * The type of the listenable collection returned will depend on that of the provided collection :
+	 * <ul>
+	 * <li>wrapping a Set<T> will return a ListenableSet&lt;T&gt;, using ListenableCollections.listenableSet(Set&lt;T&gt;)</li>
+	 * <li>wrapping a List<T> will return a ListenableList&lt;T&gt;, using ListenableCollections.listenableList(List&lt;T&gt;)</li>
+	 * <li>wrapping a ListenableCollection&lt;T&gt; will return the same object</li>
+	 * <li>otherwise a instance of a ListenableCollection&lt;T&gt; will be returned.</li>
+	 * </ul>
+	 * @param <T>
+	 * @param collectionToWrap
+	 * @return listenable collection that uses the provided collection as storage
+	 */
+	public static final <T> ListenableCollection<T> listenableCollection(Collection<T> collectionToWrap) {
+		if (collectionToWrap instanceof ListenableCollection)
+			return (ListenableCollection<T>)collectionToWrap;
+		
+		if (collectionToWrap instanceof Set) {
+			return listenableSet((Set<T>)collectionToWrap);
+		} else if (collectionToWrap instanceof List) {
+			return listenableList((List<T>)collectionToWrap);
 		}
-		return new DefaultListenableCollection<T>(x);
+		return new DefaultListenableCollection<T>(collectionToWrap);
 	}
 	
-	public static final <T> ListenableList<T> listenableList(List<T> x) {
-		if (x instanceof RandomAccess) {
+	/**
+	 * Wraps a list in a listenable list.<br/>
+	 * If is provided with a list that implements the RandomAccess interface, this method returns a listenable list that also implements the RandomAccess interface. 
+	 * @param <T>
+	 * @param listToWrap
+	 * @return listenable list that uses the provided list as storage
+	 */
+	public static final <T> ListenableList<T> listenableList(List<T> listToWrap) {
+		if (listToWrap instanceof ListenableList)
+			return (ListenableList<T>)listToWrap;
+		
+		if (listToWrap instanceof RandomAccess) {
 			class RandomAccessListenableList extends DefaultListenableList<T> implements RandomAccess {
 				public RandomAccessListenableList(List<T> l) {
 					super(l);
 				}
 			};
-			return new RandomAccessListenableList(x);
+			return new RandomAccessListenableList(listToWrap);
 		}
-		return new DefaultListenableList<T>(x);
+		return new DefaultListenableList<T>(listToWrap);
 	}
 	
-	public static final <T> ListenableSet<T> listenableSet(Set<T> x) {
-		if (x instanceof SortedSet) {
-			return new DefaultListenableSortedSet<T>((SortedSet<T>)x);
+	/**
+	 * Wraps a set in a listenable set.<br/>
+	 * If is provided with a set that implements the SortedSet interface, this method returns a listenable set that also implements the SortedSet interface. 
+	 * @param <T>
+	 * @param setToWrap
+	 * @return listenable set that uses the provided set as storage
+	 */
+	public static final <T> ListenableSet<T> listenableSet(Set<T> setToWrap) {
+		if (setToWrap instanceof ListenableSet)
+			return (ListenableSet<T>)setToWrap;
+		
+		if (setToWrap instanceof SortedSet) {
+			return new DefaultListenableSortedSet<T>((SortedSet<T>)setToWrap);
 		}
-		return new DefaultListenableSet<T>(x);
+		return new DefaultListenableSet<T>(setToWrap);
 	}
 	
 	public static final <K,V> ListenableMap<K,V> listenableMap(Map<K,V> x) {
