@@ -67,16 +67,6 @@ import javax.swing.table.AbstractTableModel;
 public class ListenableTableModel<T> extends AbstractTableModel {
 	private static final long serialVersionUID = -9033649750678420736L;
 
-	public static abstract class AbstractNamedAdapter<T> implements Adapter<T, Object> {
-		String name;
-		public AbstractNamedAdapter(String name) {
-			this.name = name;
-		}
-		public String toString() {
-			return name;
-		}
-	}
-
 	public final ListenableList<T> list;
 	public final ListenableList<Adapter<T, Object>> columns = ListenableCollections.listenableList(new ArrayList<Adapter<T, Object>>());
 	
@@ -127,6 +117,7 @@ public class ListenableTableModel<T> extends AbstractTableModel {
 		abstract class Column implements Adapter<File,Object> {
 			String name;
 			public Column(String name) { this.name = name; }
+			public String toString() { return name; }
 		};
 		tableModel.columns.add(new Column("File Name") { 
 			public Object adapt(File file) { return file.getName(); }
