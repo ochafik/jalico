@@ -23,9 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -42,15 +39,15 @@ import javax.swing.table.AbstractTableModel;
  * <code><pre>
  * 	ListenableList&lt;File&gt; filesList = new DefaultListenableList&lt;File&gt;(new ArrayList&lt;File&gt;(Arrays.asList(new File(".").listFiles())));
  * 	ListenableTableModel&lt;File&gt; tableModel = new ListenableTableModel&lt;File&gt;(filesList);
- * 	tableModel.addColumnAdapter(new Adapter&lt;File,Object&gt;() {
+ * 	tableModel.columns.add(new Adapter&lt;File,Object&gt;() {
  * 		public String toString() { return "File Name"; } 
  * 		public Object adapt(File file) { return file.getName(); }
  * 	});
- * 	tableModel.addColumnAdapter(new Adapter&lt;File,Object&gt;() {
+ * 	tableModel.columns.add(new Adapter&lt;File,Object&gt;() {
  * 		public String toString() { return "Size"; } 
  * 		public Object adapt(File file) { return file.length(); }
  * 	});
- * 	tableModel.addColumnAdapter(new Adapter&lt;File,Object&gt;() {
+ * 	tableModel.columns.add(new Adapter&lt;File,Object&gt;() {
  * 		public String toString() { return "Last Modification"; } 
  *		public Object adapt(File file) { return new Date(file.lastModified()); }
  *	});
@@ -80,10 +77,9 @@ public class ListenableTableModel<T> extends AbstractTableModel {
 		}
 	}
 
-	ListenableList<T> list;
-	List<Adapter<T, Object>> columnAdapters = new ArrayList<Adapter<T, Object>>();
-	Map<String, Integer> nameToColIndex = new HashMap<String, Integer>();
-
+	public final ListenableList<T> list;
+	public final ListenableList<Adapter<T, Object>> columns = ListenableCollections.listenableList(new ArrayList<Adapter<T, Object>>());
+	
 	public ListenableTableModel(ListenableList<T> list) {
 		this.list = list;
 		list.addCollectionListener(new SwingCollectionListener<T>(new CollectionListener<T>() {
@@ -102,63 +98,50 @@ public class ListenableTableModel<T> extends AbstractTableModel {
 				}
 			}
 		}));
+		columns.addCollectionListener(new CollectionListener<Adapter<T,Object>>() { public void collectionChanged(com.ochafik.util.listenable.CollectionEvent<com.ochafik.util.listenable.Adapter<T,Object>> e) {
+			fireTableStructureChanged();
+		}});
 	}
-
-	boolean upToDate = false;
-	public void addColumnAdapter(Adapter<T, Object> columnAdapter) {
-		columnAdapters.add(columnAdapter);
-		upToDate = false;
-	}	
-	protected void updateNameToColIndex() {
-		if (upToDate) return;
-		int i = 0;
-		nameToColIndex.clear();
-		for (Adapter<T, Object> columnAdapter : columnAdapters) {
-			nameToColIndex.put(columnAdapter.toString(), i++);
-		}
-		upToDate = true;
-	}
-	public int getColumn(String name) {
-		updateNameToColIndex();
-		return nameToColIndex.get(name);
-	}
-	public ListenableList<T> getList() { return list; }
+	
 	public int getRowCount() {
 		return list.size();
 	}
+	
 	public int getColumnCount() {
-		return columnAdapters.isEmpty() ? 1 : columnAdapters.size();
+		return columns.isEmpty() ? 1 : columns.size();
 	}
 
 	public String getColumnName(int column) {
-		return columnAdapters.get(column).toString();
+		return columns.get(column).toString();
 	}
+	
 	public Object getValueAt(int row, int column) {
 		T item = list.get(row);
-		return column < 0 || columnAdapters.isEmpty() ? item : columnAdapters.get(column).adapt(item);
+		return column < 0 || columns.isEmpty() ? item : columns.get(column).adapt(item);
 	}
 
 	public static void main(String[] args) {
 		ListenableList<File> filesList = new DefaultListenableList<File>(new ArrayList<File>(Arrays.asList(new File(".").listFiles())));
 		ListenableTableModel<File> tableModel = new ListenableTableModel<File>(filesList);
-		tableModel.addColumnAdapter(new Adapter<File,Object>() {
-			public String toString() { return "File Name"; } 
+		
+		abstract class Column implements Adapter<File,Object> {
+			String name;
+			public Column(String name) { this.name = name; }
+		};
+		tableModel.columns.add(new Column("File Name") { 
 			public Object adapt(File file) { return file.getName(); }
 		});
-		tableModel.addColumnAdapter(new Adapter<File,Object>() {
-			public String toString() { return "Size"; } 
+		tableModel.columns.add(new Column("Size") { 
 			public Object adapt(File file) { return file.length(); }
 		});
-		tableModel.addColumnAdapter(new Adapter<File,Object>() {
-			public String toString() { return "Last Modification"; } 
+		tableModel.columns.add(new Column("Last Modification") { 
 			public Object adapt(File file) { return new Date(file.lastModified()); }
 		});
+		
 		JFrame frame = new JFrame();
 		frame.getContentPane().add("Center", new JScrollPane(new JTable(tableModel)));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
-		frame.setVisible(true);
-
-		
+		frame.setVisible(true);		
 	}
 }
