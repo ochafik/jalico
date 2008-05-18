@@ -221,5 +221,9 @@ public class ListenableCollections {
 	public static final <K,V> ListenableMap<K,V> listenableMap(Map<K,V> x) {
 		return new DefaultListenableMap<K,V>(x);
 	}
+
+	public static <U,V> Collection<V> adapt(Collection<U> col, Adapter<U, V> adapter) {
+		return new AdaptedCollection<U, V>(col, adapter);
+	}
 	
 }
