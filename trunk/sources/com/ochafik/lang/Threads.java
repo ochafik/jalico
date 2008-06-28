@@ -14,16 +14,13 @@ import java.util.concurrent.Semaphore;
  * <p>
  * Group of coordinated Runnable instances that can be started, interrupted and waited for together.
  * </p><p>
- * It provides for a handy join() method, that waits till all runnables finished their execution.
- * </p><p>
  * Once you added as many runnable tasks as needed through the add(Runnable) method,  
  * there are two ways of waiting for the tasks to finish :
  * <ul>
  * <li>call join() in some thread. This will implicitely start the threads if start() was not called yet, and the join() method will not return until all the thread finished their execution
- * </li><li>register some ActionListener instances and call start() (you cannot register listeners after start() was called). Whenever all threads finished their execution, the actionPerformed method of all the listeners will be called.
+ * </li><li>call start() and register some ActionListener instances. Whenever all threads finished their execution, the actionPerformed method of all the listeners will be called.
  * </li>
- * @author ochafik
- *
+ * @author Olivier Chafik
  */
 public final class Threads {
 	private final List<Runner> runners = new ArrayList<Runner>();
@@ -42,7 +39,7 @@ public final class Threads {
 				runnable.run();
 			} finally {
 				int nThreads = runners.size();
-				if (!actionListeners.isEmpty() && semaphore.tryAcquire(nThreads - 1)) {
+				if (semaphore.tryAcquire(nThreads - 1)) {
 					synchronized (this) {
 						if (!fired) {
 							fireActionPerformed();
@@ -145,19 +142,18 @@ public final class Threads {
 	
 	/**
 	 * Adds a listener that will be notified upon completion of all of the running threads.
-	 * Must not be called after a call to start() or join() (would then throw an IllegalThreadStateException).
+	 * Its actionPerformed method will be called immediately if the threads already finished.
 	 * @param actionListener
-	 * @throws IllegalThreadStateException if start() or join() were called before
 	 */
 	public synchronized void addActionListener(ActionListener actionListener) {
-		if (started)
-			// We could allow this, but it would be unsafe
-			throw new IllegalThreadStateException("Cannot add an action listener to " + getClass().getSimpleName() + " after it started !");
-		
 		if (actionListeners == null)
 			actionListeners = new ArrayList<ActionListener>();
 		
 		actionListeners.add(actionListener);
+		
+		if (fired) {
+			actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, ""));
+		}
 	}
 	
 	private synchronized void fireActionPerformed() {
