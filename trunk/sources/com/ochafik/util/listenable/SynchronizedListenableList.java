@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
-public class SynchronizedListenableList<T> extends SynchronizedListenableCollection<T> implements ListenableList<T> {
+class SynchronizedListenableList<T> extends SynchronizedListenableCollection<T> implements ListenableList<T> {
 	List<T> list;
 	
 	public SynchronizedListenableList(List<T> list) {
