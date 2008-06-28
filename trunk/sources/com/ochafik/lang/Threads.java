@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.ochafik.util.listenable;
+package com.ochafik.lang;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
