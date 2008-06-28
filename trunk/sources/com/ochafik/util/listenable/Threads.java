@@ -113,23 +113,29 @@ public final class Threads {
 	 * @throws InterruptedException if method interrupt() was called on the thread that is calling this method.
 	 */
 	public synchronized void join() throws InterruptedException {
+		int nThreads = runners.size();
+		if (nThreads == 0)
+			return;
+		
 		if (!started)
 			start();
 		
-		int nThreads = runners.size();
 		semaphore.acquire(nThreads);
 		semaphore.release(nThreads);
 	}
 	
 	public enum State {
-		NotStarted, Running, Finished
+		NotStarted, Running, Finished, NoRunnables
 	}
 	
 	public synchronized State getState() {
+		int nThreads = runners.size();
+		if (nThreads == 0)
+			return State.NoRunnables;
+		
 		if (!started)
 			return State.NotStarted;
 		
-		int nThreads = runners.size();
 		if (semaphore.tryAcquire(nThreads)) {
 			semaphore.release(nThreads);
 			return State.Finished;

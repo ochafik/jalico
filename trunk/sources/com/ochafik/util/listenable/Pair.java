@@ -2,6 +2,8 @@ package com.ochafik.util.listenable;
 
 import java.util.Map;
 
+import com.ochafik.lang.SyntaxUtils;
+
 public class Pair<U, V> implements Comparable<Pair<U, V>>, Map.Entry<U, V> {
 	private U first;
 	private V second;
@@ -36,6 +38,25 @@ public class Pair<U, V> implements Comparable<Pair<U, V>>, Map.Entry<U, V> {
 		
 		Comparable<V> cv = (Comparable<V>)getSecond();
 		return cv.compareTo(o.getSecond());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof Pair))
+			return false;
+		
+		Pair other = (Pair)obj;
+		if (!SyntaxUtils.equal(getFirst(), other.getFirst()))
+			return false;
+		return SyntaxUtils.equal(getSecond(), other.getSecond());
+	}
+	
+	@Override
+	public int hashCode() {
+		int i1 = getFirst() == null ? 0 : getFirst().hashCode();
+		int i2 = getSecond() == null ? 0 : getSecond().hashCode();
+		return i1 ^ i2;
 	}
 	
 	@Override

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.RandomAccess;
@@ -138,6 +139,10 @@ public class ListenableCollections {
 		return new UnmodifiableListenableCollection<T>(col);
 	}
 	
+	public static final <T> ListenableList<T> unmodifiableList(ListenableList<T> col) {
+		return new UnmodifiableListenableList<T>(col);
+	}
+	
 	public static final <K,V> ListenableMap<K,V> unmodifiableMap(ListenableMap<K,V> map) {
 		return new UnmodifiableListenableMap<K,V>(map);
 	}
@@ -148,6 +153,10 @@ public class ListenableCollections {
 	
 	public static final <T> ListenableCollection<T> synchronizedCollection(ListenableCollection<T> col) {
 		return new SynchronizedListenableCollection<T>(col);
+	}
+	
+	public static final <T> ListenableList<T> synchronizedList(ListenableList<T> col) {
+		return new SynchronizedListenableList<T>(col);
 	}
 	
 	public static final <K,V> ListenableMap<K,V> synchronizedMap(ListenableMap<K,V> map) {
@@ -226,4 +235,89 @@ public class ListenableCollections {
 		return new AdaptedCollection<U, V>(col, adapter);
 	}
 	
+	
+	public static final class MapResult<U, V> {
+		private final ListenableList<V> values;
+		private final Threads threads;
+		private final ListenableList<Pair<U,Throwable>> errors;
+		public MapResult(Threads threads, ListenableList<V> out, ListenableList<Pair<U,Throwable>> errorsOut) {
+			this.values = ListenableCollections.unmodifiableList(out);
+			this.threads = threads;
+			this.errors = ListenableCollections.unmodifiableList(errorsOut);
+		}
+
+		public ListenableList<V> getValues() {
+			return values;
+		}
+		public Threads getThreads() {
+			return threads;
+		}
+		public ListenableList<Pair<U, Throwable>> getErrors() {
+			return errors;
+		}
+	}
+	
+	/**
+	 * Create a list of transformed values from a source collection, using an adapter.
+	 * Operations are multithreaded depending on threadsCount : 
+	 * <ul>
+	 * <li>if threadsCount == 0 : all operations happen in current thread
+	 * </li><li>if threadCount > 0, mapping is done with threadCount threads
+	 * </li><li>if threadCount < 0, mapping is done with -threadsCount * Runtime.getRuntime().availableProcessors() threads. For instance, on a single-processor, dual-core computer (with all cores available to Java), setting threadsCount to -2 will use 2 * 2 = 4 threads.
+	 * </li></ul>
+	 * In the case of multithreaded mapping, map returns immediately. <br/>
+	 * One can listen to the listenable list of result values in MapResult.getValues(), and register ActionListener instances in MapResult.getThreads().<br/> 
+	 * One can also call MapResult.getThreads().join() to wait for all running threads to finish (blocking call).<br/>
+	 * 
+	 * @param <U> input elements type
+	 * @param <V> output elements type
+	 * @param input input values that are to be transformed by the adapter
+	 * @param mapper converter from the input type to the output type
+	 * @param threadsCount 0 for no multithreading, X > 0 for X threads, -X for X threads per-core 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public static <U, V> MapResult<U, V> map(Collection<U> input, final Adapter<U, V> mapper, int threadsCount) {
+		if (threadsCount < 0)
+			threadsCount = - threadsCount * Runtime.getRuntime().availableProcessors();
+		
+		final Iterator<U> it = input.iterator();
+		final ListenableList<V> out = ListenableCollections.synchronizedList(ListenableCollections.listenableList(new ArrayList<V>(input.size())));
+		final ListenableList<Pair<U,Throwable>> errorsOut = ListenableCollections.synchronizedList(ListenableCollections.listenableList(new ArrayList<Pair<U,Throwable>>()));
+		
+		Threads threadsJoint = new Threads();
+		
+		Runnable worker = new Runnable() { public void run() {
+			for (;!Thread.interrupted();) {
+				U value;
+				synchronized (it) {
+					if (!it.hasNext())
+						break;
+					value = it.next();
+				}
+				
+				try {
+					V mappedValue = mapper.adapt(value);
+					synchronized (out) {
+						out.add(mappedValue);
+					}
+				} catch (Throwable th) {
+					synchronized (errorsOut) {
+						errorsOut.add(new Pair<U, Throwable>(value, th));
+					}
+				}
+				//Thread.yield();
+			}
+		}};
+		
+		if (threadsCount == 0) {
+			worker.run();
+		} else {
+			for (int iWorker = threadsCount; iWorker-- != 0;)
+				threadsJoint.add(worker);
+			
+			threadsJoint.start();
+		}	
+		return new MapResult<U, V>(threadsJoint, out, errorsOut);
+	}
 }
