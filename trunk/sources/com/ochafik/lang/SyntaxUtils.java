@@ -1,9 +1,5 @@
 package com.ochafik.lang;
 
-import javax.swing.tree.TreeNode;
-
-import com.ochafik.util.grammar.SwingParseTreeNode;
-
 public class SyntaxUtils {
 	public static <T> T[] array(T... elements) {
 		return elements;
