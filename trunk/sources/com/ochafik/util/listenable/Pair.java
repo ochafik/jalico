@@ -32,31 +32,19 @@ public class Pair<U, V> implements Comparable<Pair<U, V>>, Map.Entry<U, V> {
 	@SuppressWarnings("unchecked")
 	public int compareTo(Pair<U, V> o) {
 		Comparable<U> cu = (Comparable<U>)getFirst();
-		int d = cu.compareTo(o.getFirst());
-		if (d != 0)
-			return d;
+		if (cu == null) {
+			if (first != null)
+				return 1;
+		} else {
+			int d = cu.compareTo(o.getFirst());
+			if (d != 0)
+				return d;
+		}
 		
 		Comparable<V> cv = (Comparable<V>)getSecond();
+		if (cv == null)
+			return second != null ? 1 : -1;
 		return cv.compareTo(o.getSecond());
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof Pair))
-			return false;
-		
-		Pair other = (Pair)obj;
-		if (!SyntaxUtils.equal(getFirst(), other.getFirst()))
-			return false;
-		return SyntaxUtils.equal(getSecond(), other.getSecond());
-	}
-	
-	@Override
-	public int hashCode() {
-		int i1 = getFirst() == null ? 0 : getFirst().hashCode();
-		int i2 = getSecond() == null ? 0 : getSecond().hashCode();
-		return i1 ^ i2;
 	}
 	
 	@Override
@@ -76,5 +64,36 @@ public class Pair<U, V> implements Comparable<Pair<U, V>>, Map.Entry<U, V> {
 		V oldValue = second;
 		second = value;
 		return oldValue;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((first == null) ? 0 : first.hashCode());
+		result = prime * result + ((second == null) ? 0 : second.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final Pair other = (Pair) obj;
+		if (first == null) {
+			if (other.first != null)
+				return false;
+		} else if (!first.equals(other.first))
+			return false;
+		if (second == null) {
+			if (other.second != null)
+				return false;
+		} else if (!second.equals(other.second))
+			return false;
+		return true;
 	}
 }
