@@ -19,14 +19,18 @@
  */
 package com.ochafik.util.listenable;
 
+import sun.awt.shell.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -119,6 +123,9 @@ public class ListenableTableModel<T> extends AbstractTableModel {
 			public Column(String name) { this.name = name; }
 			public String toString() { return name; }
 		};
+		tableModel.columns.add(new Column("Ic™ne") { 
+            public Object adapt(File file) { return FileSystemView.getFileSystemView().getSystemIcon(file); }
+        });
 		tableModel.columns.add(new Column("File Name") { 
 			public Object adapt(File file) { return file.getName(); }
 		});
@@ -134,5 +141,18 @@ public class ListenableTableModel<T> extends AbstractTableModel {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setVisible(true);		
+	}
+	@Override
+	public Class<?> getColumnClass(int columnIndex) {
+		for (T item : list) {
+			Object value = columns.get(columnIndex).adapt(item);
+			if (value != null) {
+				Class<?> c = value.getClass();
+				if (Icon.class.isAssignableFrom(c))
+					c = Icon.class;
+				return c;
+			}
+		}
+		return super.getColumnClass(columnIndex);
 	}
 }
