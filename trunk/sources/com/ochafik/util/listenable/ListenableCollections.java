@@ -278,7 +278,6 @@ public class ListenableCollections {
 	 * @param threadsCount 0 for no multithreading, X > 0 for X threads, -X for X threads per-core 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public static <U, V> MapResult<U, V> map(Collection<U> input, final Adapter<U, V> mapper, int threadsCount) {
 		if (threadsCount < 0)
 			threadsCount = - threadsCount * Runtime.getRuntime().availableProcessors();
@@ -321,5 +320,26 @@ public class ListenableCollections {
 			threadsJoint.start();
 		}	
 		return new MapResult<U, V>(threadsJoint, out, errorsOut);
+	}
+	
+	public <T> int removeIf(Collection<T> collection, Filter<T> filter) {
+		int removed = 0;
+		for (Iterator<T> it = collection.iterator(); it.hasNext();) {
+			if (filter.accept(it.next())) {
+				it.remove();
+				removed++;
+			}
+		}
+		return removed;
+	}
+	public <T> int retainIf(Collection<T> collection, Filter<T> filter) {
+		int removed = 0;
+		for (Iterator<T> it = collection.iterator(); it.hasNext();) {
+			if (!filter.accept(it.next())) {
+				it.remove();
+				removed++;
+			}
+		}
+		return removed;
 	}
 }

@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 class SynchronizedListenableCollection<T> extends DefaultListenableCollection<T> {
-	Object mutex;
+	protected Object mutex;
 	
 	
 	public SynchronizedListenableCollection(Collection<T> collection, ListenableSupport<T> collectionSupport) {
@@ -103,27 +103,33 @@ class SynchronizedListenableCollection<T> extends DefaultListenableCollection<T>
 			return super.isEmpty();
 		}
 	}
+	
+	protected class SynchronizedListenableIterator implements Iterator<T> {
+		final Iterator<T> it;
+		public SynchronizedListenableIterator() {
+			this.it = SynchronizedListenableCollection.super.iterator();
+		}
+		public boolean hasNext() {
+			synchronized (mutex) {
+				return it.hasNext();
+			}
+		}
+		public T next() {
+			synchronized (mutex) {
+				return it.next();
+			}
+		}
+		public void remove() {
+			synchronized (mutex) {
+				it.remove();
+			}
+		}
+	};
+	
 	@Override
 	public Iterator<T> iterator() {
 		synchronized (mutex) {
-			final Iterator<T> it = super.iterator();
-			return new Iterator<T>() {
-				public boolean hasNext() {
-					synchronized (mutex) {
-						return it.hasNext();
-					}
-				}
-				public T next() {
-					synchronized (mutex) {
-						return it.next();
-					}
-				}
-				public void remove() {
-					synchronized (mutex) {
-						it.remove();
-					}
-				}
-			};
+			return new SynchronizedListenableIterator();//super.iterator());
 		}
 	}
 	@Override

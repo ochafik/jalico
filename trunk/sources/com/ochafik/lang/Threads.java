@@ -1,3 +1,21 @@
+/*
+	Copyright (c) 2009 Olivier Chafik, All Rights Reserved
+	
+	This file is part of JNAerator (http://jnaerator.googlecode.com/).
+	
+	JNAerator is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+	
+	JNAerator is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with JNAerator.  If not, see <http://www.gnu.org/licenses/>.
+*/
 /**
  * 
  */
@@ -40,13 +58,13 @@ public final class Threads {
 			} finally {
 				int nThreads = runners.size();
 				if (semaphore.tryAcquire(nThreads - 1)) {
+					semaphore.release(nThreads);
 					synchronized (this) {
 						if (!fired) {
-							fireActionPerformed();
 							fired = true;
+							fireActionPerformed();
 						}
 					}
-					semaphore.release(nThreads);
 				} else {
 					semaphore.release();
 				}
@@ -157,6 +175,9 @@ public final class Threads {
 	}
 	
 	private synchronized void fireActionPerformed() {
+		if (actionListeners == null) 
+			return;
+		
 		ActionEvent a = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "");
 		for (ActionListener l : actionListeners)
 			l.actionPerformed(a);

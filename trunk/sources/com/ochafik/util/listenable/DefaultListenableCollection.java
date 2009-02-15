@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Default implementation of the ListenableCollection interface.<br/>
@@ -49,10 +50,11 @@ public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 	}
 	public boolean add(T o) {
 		boolean added = collection.add(o);
+		int index = collection instanceof List<?> ? size() : -1;
 		if (added) {
-			collectionSupport.fireAdded(this,Collections.singleton(o));
+			collectionSupport.fireAdded(this,Collections.singleton(o), index, index);
 		} else {
-			collectionSupport.fireUpdated(this,Collections.singleton(o));
+			collectionSupport.fireUpdated(this,Collections.singleton(o), index, index);
 		}
 		return added;
 	}
@@ -65,8 +67,10 @@ public class DefaultListenableCollection<T> implements ListenableCollection<T> {
 		for (T t : c) {
 			(collection.add(t) ? addedElements : updatedElements).add(t);
 		}
-		collectionSupport.fireAdded(this, addedElements);
-		collectionSupport.fireUpdated(this, updatedElements);
+		int firstIndex = collection instanceof List<?> ? size() : -1, 
+				lastIndex = firstIndex < 0 ? -1 : firstIndex + addedElements.size() - 1; 
+		collectionSupport.fireAdded(this, addedElements, firstIndex, lastIndex);
+		collectionSupport.fireUpdated(this, updatedElements, firstIndex, lastIndex);
 
 		return !addedElements.isEmpty();
 	}

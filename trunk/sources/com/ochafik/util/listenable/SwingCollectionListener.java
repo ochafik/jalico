@@ -34,15 +34,12 @@ public class SwingCollectionListener<T> implements CollectionListener<T> {
 	}
 
 	public void collectionChanged(final CollectionEvent<T> e) {
-		Runnable r = new Runnable() {
-			public void run() {
+		if (SwingUtilities.isEventDispatchThread())
+			listener.collectionChanged(e);
+		else
+			SwingUtilities.invokeLater(new Runnable() { public void run() {
 				listener.collectionChanged(e);
-			};
-		};
-		if (SwingUtilities.isEventDispatchThread()) {
-			r.run();
-		} else {
-			SwingUtilities.invokeLater(r);
-		}
+			}});
+		
 	}	
 }

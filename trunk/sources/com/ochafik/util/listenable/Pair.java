@@ -13,6 +13,8 @@ public class Pair<U, V> implements Comparable<Pair<U, V>>, Map.Entry<U, V> {
 		this.second = second;
 	}
 	
+	public Pair() {}
+
 	public U getFirst() {
 		return first;
 	}
@@ -95,5 +97,13 @@ public class Pair<U, V> implements Comparable<Pair<U, V>>, Map.Entry<U, V> {
 		} else if (!second.equals(other.second))
 			return false;
 		return true;
+	}
+
+	public boolean isFull() {
+		return getFirst() != null && getSecond() != null;
+	}
+	
+	public boolean isEmpty() {
+		return getFirst() == null && getSecond() == null;
 	}
 }
