@@ -40,7 +40,7 @@ public class ListenableListModel<T> extends AbstractListModel {
 	}
 	public ListenableListModel() {}
 	
-	CollectionListener<T> listener  =new SwingCollectionListener<T>(new CollectionListener<T>() {
+	CollectionListener<T> listener = new SwingCollectionListener<T>(new CollectionListener<T>() {
 		public void collectionChanged(CollectionEvent<T> e) {
 			switch (e.getType()) {
 			case ADDED:
