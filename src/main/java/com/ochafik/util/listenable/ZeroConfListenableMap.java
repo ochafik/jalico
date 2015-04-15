@@ -144,7 +144,7 @@ static ListenableMap<String, ServiceInfo> advertisedServices;
 	public static JmDNS getJmDNS() {
 		if (jmDNS == null) {
 			try {
-				jmDNS = new JmDNS();
+				jmDNS = JmDNS.create();
 			} catch (IOException e) {
 				e.printStackTrace();
 				return null;
@@ -166,7 +166,8 @@ static ListenableMap<String, ServiceInfo> advertisedServices;
 			public void windowClosing(WindowEvent e) {
 				e.getWindow().setVisible(false);
 				if (jmDNS != null) 
-					jmDNS.close();
+					try{jmDNS.close();}
+				catch(IOException ex){ex.printStackTrace();}
 				System.exit(0);
 			}
 		});
@@ -175,7 +176,7 @@ static ListenableMap<String, ServiceInfo> advertisedServices;
 		Random random = new Random();
 		for (int i = 5; i-- != 0;) {
 			String name = "Fake iTunes library " + random.nextInt();
-			getAdvertisedServiceInfos().put(name, new ServiceInfo(key, name, 11, "fuck !"));
+			getAdvertisedServiceInfos().put(name, ServiceInfo.create(key, name, 11, "fuck !"));
 		}
 	}
 }

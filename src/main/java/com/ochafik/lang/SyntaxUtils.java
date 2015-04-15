@@ -20,7 +20,6 @@ package com.ochafik.lang;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
@@ -38,8 +37,6 @@ import java.util.NoSuchElementException;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import com.ochafik.util.DateUtils;
 
 
 public class SyntaxUtils {

@@ -42,13 +42,12 @@ public class ListenableComboModel<T> extends ListenableListModel<T> implements C
 	
 	T selectedItem;
 	
-	@Override
 	public Object getSelectedItem() {
 		if (selectedItem != null && !getList().contains(selectedItem))
 			selectedItem = null;
 		return selectedItem;
 	}
-	@Override
+	
 	public void setSelectedItem(Object anItem) {
 		if (getList().contains(anItem))
 			selectedItem = (T)anItem;
