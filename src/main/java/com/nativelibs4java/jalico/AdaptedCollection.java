@@ -137,12 +137,12 @@ public class AdaptedCollection<U, V> extends AbstractCollection<V> implements Li
 			}
 			return false;
 		} else {
-			return removeWithoutBackWardAdapter(value);
+			return removeWithBackwardAdapter(value);
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected boolean removeWithoutBackWardAdapter(Object value) {
+	protected boolean removeWithBackwardAdapter(Object value) {
 	    if(backwardAdapter==null)
 		    throw new UnsupportedOperationException("Cannot perform operation with a null backward Adapter.");
 		try {
