@@ -1,12 +1,9 @@
 package com.nativelibs4java.jalico;
 
-import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
-public class AbstractAdaptedCollectionForwardTest extends
+public abstract class AbstractAdaptedCollectionForwardTest extends
 	AbstractAdaptedCollectionTest {
 
     @Before

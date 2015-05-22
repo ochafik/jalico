@@ -3,7 +3,7 @@ package com.nativelibs4java.jalico;
 import org.junit.After;
 import org.junit.Before;
 
-public class AbstractAdaptedCollectionBiDiTest extends
+public abstract class AbstractAdaptedCollectionBiDiTest extends
 	AbstractAdaptedCollectionTest {
 
     @Before
