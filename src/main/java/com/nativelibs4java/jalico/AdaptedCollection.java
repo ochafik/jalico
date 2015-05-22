@@ -143,6 +143,8 @@ public class AdaptedCollection<U, V> extends AbstractCollection<V> implements Li
 	
 	@SuppressWarnings("unchecked")
 	protected boolean removeWithoutBackWardAdapter(Object value) {
+	    if(backwardAdapter==null)
+		    throw new UnsupportedOperationException("Cannot perform operation with a null backward Adapter.");
 		try {
 			currentlyCausingChange = true;
 			if (collection.remove(backwardAdapter.adapt((V)value))) {
