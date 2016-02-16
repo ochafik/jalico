@@ -173,7 +173,7 @@ public class ListenableCollections {
 	 * <li>otherwise a instance of a ListenableCollection&lt;T&gt; will be returned.</li>
 	 * </ul>
 	 * @param <T> component type
-	 * @param collectionToWrap
+	 * @param collectionToWrap collection to wrap
 	 * @return listenable collection that uses the provided collection as storage
 	 */
 	public static final <T> ListenableCollection<T> listenableCollection(Collection<T> collectionToWrap) {
@@ -192,7 +192,7 @@ public class ListenableCollections {
 	 * Wraps a list in a listenable list.<br>
 	 * If is provided with a list that implements the RandomAccess interface, this method returns a listenable list that also implements the RandomAccess interface. 
 	 * @param <T> component type
-	 * @param listToWrap
+	 * @param listToWrap list to wrap
 	 * @return listenable list that uses the provided list as storage
 	 */
 	public static final <T> ListenableList<T> listenableList(List<T> listToWrap) {
@@ -214,7 +214,7 @@ public class ListenableCollections {
 	 * Wraps a set in a listenable set.<br>
 	 * If is provided with a set that implements the SortedSet interface, this method returns a listenable set that also implements the SortedSet interface. 
 	 * @param <T> component type
-	 * @param setToWrap
+	 * @param setToWrap set to wrap
 	 * @return listenable set that uses the provided set as storage
 	 */
 	public static final <T> ListenableSet<T> listenableSet(Set<T> setToWrap) {

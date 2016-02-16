@@ -26,7 +26,7 @@ import javax.swing.ComboBoxModel;
  * This model safely propagates events from the listenable list to any registered ListDataListener within the event dispatch thread, even if the events were received from an other thread.
  * @see javax.swing.event.ListDataListener
  * @see javax.swing.JList
- * @see com.ochafik.util.listenable.SwingCollectionListener 
+ * @see SwingCollectionListener
  * @author Olivier Chafik
  * @param <T> Type of the elements of the list
  */
