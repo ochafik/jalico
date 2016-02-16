@@ -26,7 +26,7 @@ import javax.swing.AbstractListModel;
  * This model safely propagates events from the listenable list to any registered ListDataListener within the event dispatch thread, even if the events were received from an other thread.
  * @see javax.swing.event.ListDataListener
  * @see javax.swing.JList
- * @see com.ochafik.util.listenable.SwingCollectionListener 
+ * @see SwingCollectionListener 
  * @author Olivier Chafik
  * @param <T> Type of the elements of the list
  */
@@ -59,7 +59,7 @@ public class ListenableListModel<T> extends AbstractListModel {
 	/**
 	 * Set or change the listenable list which content is reflected by this list model.<br>
 	 * May trigger DELETED events (if there was already a non-empty underlying list) and ADDED events (if the list being set is not empty).
-	 * @param list
+	 * @param list the list to set
 	 */
 	public void setList(ListenableList<T> list) {
 		ListenableList<T> oldList = this.list;
